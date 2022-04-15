@@ -37,3 +37,6 @@ override.tf.json
 .terraformrc
 terraform.rc
 .terraform.lock.hcl
+
+# Ignore custom aws profile file
+aws.profile.tf

@@ -1,0 +1,1 @@
+variable "BASTION_PRIV_KEY" {} // declared in terraform.tfvars
