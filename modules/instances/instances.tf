@@ -26,8 +26,10 @@ resource "aws_instance" "polygon_edge_instance" {
 
 // create the instance network interface
 resource "aws_network_interface" "instance_interface" {
-  subnet_id = var.internal_subnet_id
+  subnet_id = var.internal_subnet.id
   security_groups = var.internal_sec_groups
+  // set static ip addresses for all nodes
+  private_ips = [ join("", [trimsuffix("${var.internal_subnet.cidr_block}","0/24"), var.node_index+4]) ]
 
   tags = {
     Name = var.instance_interface_name_tag

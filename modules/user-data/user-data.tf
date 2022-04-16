@@ -16,6 +16,8 @@ data "template_file" "polygon_edge_node" {
     "node_name" = var.node_name
     "assm_path" = var.assm_path
     "assm_region" = var.assm_region
+    "controller_ip" = var.controller_ip
+    "total_nodes" = var.total_nodes
   }
 }
 

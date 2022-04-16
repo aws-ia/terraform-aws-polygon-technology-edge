@@ -17,6 +17,18 @@ resource "aws_security_group" "polygon_internal" {
       prefix_list_ids = []
       security_groups = []
     },
+    // allow communication to the controller
+    {
+      description      = "Controller Allow"
+      from_port        = 9001
+      to_port          = 9001
+      protocol         = "tcp"
+      self          = true
+      cidr_blocks = []
+      ipv6_cidr_blocks = []
+      prefix_list_ids = []
+      security_groups = []
+    },
     // allow public access to the JSON-RPC API
     {
       description      = "Allow Public Access to nodes JSON-RPC"

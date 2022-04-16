@@ -32,3 +32,14 @@ variable "node_name" {
   type = string
   description = "The name of the node that will be different for every node and stored in AWS SSM"
 }
+
+variable "controller_ip" {
+  type = string
+  description = "The ip address of the node which is running edge controller service"
+}
+
+variable "total_nodes" {
+  type = string
+  description = "The total number of validator nodes"
+  default = "4"
+}

@@ -33,8 +33,7 @@ variable "instance_name" {
   description = "The name of Polygon Edge instance"
 }
 
-variable "internal_subnet_id" {
-  type = string
+variable "internal_subnet" {
   description = "The subnet id in which to place the instance."
 }
 
@@ -71,4 +70,10 @@ variable "instance_iam_role" {
   default = ""
   type = string
   description = "The IAM role to attach to the instance"
+}
+
+variable "node_index" {
+  default = 0
+  type = number
+  description = "The count.index of the node"
 }

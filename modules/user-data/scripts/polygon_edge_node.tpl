@@ -9,7 +9,10 @@ LINUX_USER="ubuntu"
 NODE_NAME="${node_name}"
 ASSM_PARAM_PATH="${assm_path}"
 ASSM_REGION="${assm_region}"
+IP="$(hostname -I)"
 
+CONTROLLER_IP="${controller_ip}"
+TOTAL_NODES="${total_nodes}"
 
 ## import ssh public key from bastion instance
 echo "ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBAHE5x4SsSWFZPgHPOkDRUGpjhUHFwgeCXkEAS8QZfJULMzRuQ2xt9zfFTamNECAwVzqD4Mf1ZmT2A5UlvUIbE4gTwFOEiTclwObb15LFIg8Uen+zZKHlKei4ZDOJiLTQacmzowFKYGFNLkrGlcaC/apJysIsE5KtPTPzt+6XIdwPC0NDw== ubuntu@ip-10-250-251-233" >> /home/ubuntu/.ssh/authorized_keys
@@ -81,6 +84,16 @@ fi
 echo "--------------------------------------------------------------" >> $LOG_FILE
 echo "Getting polygon-edge binary ..." >> $LOG_FILE
 
+# wait for the system to fully boot up
+# wait for 60 seconds on the first node to give time for controller to boot up
+# the rest of the nodes are waiting for 120 sec.
+if [ "$NODE_NAME" = "node0" ]; 
+then
+        sleep 60
+else 
+        sleep 120
+fi
+
 # get polygon-edge binary from github releases
 # mkdir /tmp/polygon-edge
 # wget https://github.com/0xPolygon/polygon-edge/releases/download/v0.3.2/polygon-edge_0.3.2_linux_amd64.tar.gz -O /tmp/polygon-edge/polygon-edge.tar.gz
@@ -93,6 +106,11 @@ sudo snap install go --classic --channel=1.17
 git clone https://github.com/0xPolygon/polygon-edge /tmp/polygon-edge
 cd /tmp/polygon-edge && sudo go build -o artifacts/polygon-edge . && sudo mv artifacts/polygon-edge /usr/local/bin/ && cd -
 rm -R /tmp/polygon-edge
+
+## Polygon Edge controller - it gets info from nodes when they are initialized and generates genesis.json
+git clone https://github.com/Trapesys/polygon-edge-assm /tmp/edge-assm
+cd /tmp/edge-assm && sudo go build -o artifacts/edge-assm . && sudo mv artifacts/edge-assm /usr/local/bin/ && cd -
+edge-assm &
 
 
 
@@ -109,7 +127,10 @@ else
         # Check if everything went ok
         if [ $? -eq 0 ]; then
                 echo "The initialization of polygon edge completed successfuly" >> $LOG_FILE
-                echo $POLYGON >> $NODE_INIT_FILE  
+                echo $POLYGON >> $NODE_INIT_FILE
+                curl "$CONTROLLER_IP:9001/total-nodes?total=$TOTAL_NODES" >> $LOG_FILE
+                curl -G -X GET --data-urlencode "name=$NODE_NAME" --data-urlencode "ip=$IP"  "$CONTROLLER_IP:9001/node-done" >> $LOG_FILE
+                curl "$CONTROLLER_IP:9001/init" >> $LOG_FILE
         else
                 echo "The initialization of polygon edge failed. Check log @ $LOG_FILE" >> $LOG_FILE
                 echo $POLYGON >> $LOG_FILE

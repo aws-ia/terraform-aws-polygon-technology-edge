@@ -37,8 +37,9 @@ module "instances" {
   source = "./modules/instances"
 
   count = 4
+  node_index = count.index
   ssh_key_name = "devops-zex"
-  internal_subnet_id = module.vpc.internal_subnets[0].id
+  internal_subnet = module.vpc.internal_subnets[0]
   internal_sec_groups = [module.security.internal_sec_group_id]
   user_data_base64 = module.user_data[count.index].polygon_edge_node
   instance_iam_role = module.security.ec2_to_assm_iam_policy_id
@@ -57,7 +58,7 @@ module "bastion_instance" {
   source = "./modules/instances"
 
   ssh_key_name = "devops-zex"
-  internal_subnet_id = module.vpc.external_subnets[0].id
+  internal_subnet = module.vpc.external_subnets[0]
   internal_sec_groups = [module.security.bastion_public_id]
 
   instance_name = "Polygon_Edge_Bastion"
@@ -72,8 +73,10 @@ module "user_data" {
   count = 4
   bastion_private_key = var.BASTION_PRIV_KEY
   node_name = "node${count.index}"
-
+  // address of the first node
+  controller_ip =  join("", [trimsuffix("${module.vpc.internal_subnets[0].cidr_block}","0/24"), "4"])
   /**
+    total_nodes
     polygon_edge_dir
     ebs_device
     assm_path 

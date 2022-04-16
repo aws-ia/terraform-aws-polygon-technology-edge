@@ -14,6 +14,20 @@ resource "aws_iam_role_policy" "ec2_to_assm" {
         Effect   = "Allow"
         Resource = "arn:aws:ssm:eu-central-1:430792124313:parameter/polygon-edge/nodes/*"
       },
+      {
+        Action =  [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:DeleteObject"
+        ]
+        Effect = "Allow",
+        Resource = ["arn:aws:s3:::polygon-edge-shared/*"]
+      },
+      {
+        Action =  ["s3:ListBucket"]
+        Effect = "Allow",
+        Resource = ["arn:aws:s3:::polygon-edge-shared"]
+      }
     ]
   })
 
