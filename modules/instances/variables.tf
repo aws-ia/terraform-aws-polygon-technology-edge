@@ -1,7 +1,7 @@
 variable "instance_type" {
-  default = "t2.medium"
+  default = "t3.medium"
   type = string
-  description = "Polygon Edge nodes instance type. Default: t2.medium"
+  description = "Polygon Edge nodes instance type. Default: t3.medium"
 }
 
 variable "ssh_key_name" {
@@ -16,9 +16,9 @@ variable "user_data_base64" {
 }
 
 variable "az" {
-  default = "eu-central-1a"
+  default = "us-west-2a"
   type = string
-  description = "The availability zone of the instance. Default: eu-central-1a"
+  description = "The availability zone of the instance. Default: us-west-2a"
 }
 
 variable "ebs_root_name_tag" {

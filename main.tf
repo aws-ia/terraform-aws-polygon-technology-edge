@@ -18,8 +18,15 @@ module "security" {
   source = "./modules/security"
   vpc_id = module.vpc.vpc_id
 
+  ssh_key_name = var.ssh_key_name
+  ssh_public_key = var.ssh_public_key
+
+  admin_public_ip = var.admin_ip
+  account_id= var.account_id
+
   /**
     internal_sec_gr_name_tag
+    region
   */
 }
 
@@ -38,15 +45,17 @@ module "instances" {
 
   count = 4
   node_index = count.index
-  ssh_key_name = "devops-zex"
-  internal_subnet = module.vpc.internal_subnets[0]
+  ssh_key_name = module.security.ssh_key_name
+  internal_subnet = module.vpc.internal_subnets[count.index]
   internal_sec_groups = [module.security.internal_sec_group_id]
   user_data_base64 = module.user_data[count.index].polygon_edge_node
   instance_iam_role = module.security.ec2_to_assm_iam_policy_id
+  az = module.vpc.av_zones[count.index]
+
+  depends_on = [module.bastion_instance.instance_dns_name]
   /**
     instance_type
     user_data_base64
-    az
     ebs_root_name_tag
     instance_name
     instance_interface_name_tag
@@ -57,9 +66,10 @@ module "instances" {
 module "bastion_instance" {
   source = "./modules/instances"
 
-  ssh_key_name = "devops-zex"
+  ssh_key_name = module.security.ssh_key_name
   internal_subnet = module.vpc.external_subnets[0]
   internal_sec_groups = [module.security.bastion_public_id]
+  instance_iam_role = module.security.ec2_to_assm_iam_policy_id
 
   instance_name = "Polygon_Edge_Bastion"
   instance_type = "t2.micro"
@@ -73,13 +83,54 @@ module "user_data" {
   count = 4
   bastion_private_key = var.BASTION_PRIV_KEY
   node_name = "node${count.index}"
-  // address of the first node
-  controller_ip =  join("", [trimsuffix("${module.vpc.internal_subnets[0].cidr_block}","0/24"), "4"])
+  controller_dns =  module.bastion_instance.instance_dns_name
+
+  // Chain options
+  premine = var.premine
+
+  // Server non-required options
+  /**
+  max_slots
+  block_time
+  prometheus_address
+  block_gas_target
+  nat_address
+  dns_name
+  price_limit
+  */
+
+  // Chain non-required options
+  /**
+    chain_name
+    chain_id
+    block_gas_limit
+    epoch_size
+  */
+
   /**
     total_nodes
     polygon_edge_dir
     ebs_device
     assm_path 
     assm_region
+    s3_bucket_name
   */
+}
+
+module "alb" {
+  source = "./modules/alb"
+
+  public_subnets = module.vpc.external_subnets
+  alb_sec_group = module.security.jsonrpc_sec_group_id
+  vpc_id = module.vpc.vpc_id
+  node_ids = module.instances[*].instance_ids
+
+/**
+  nodes_nlb_name
+  nodes_nlg_name_tag
+  nodes_nlb_targetgroup_name
+  nodes_nlb_targetgroup_port
+  nodes_nlb_targetgroup_proto
+  nodes_nlb_listener_port
+*/  
 }

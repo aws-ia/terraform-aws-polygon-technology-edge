@@ -11,15 +11,15 @@ variable "vpc_name_tag" {
 }
 
 variable "az" {
-  default = ["eu-central-1a","eu-central-1b","eu-central-1c"]
+  default = ["us-west-2a","us-west-2b","us-west-2c","us-west-2d"]
   type = list(string)
-  description = "The availability zones in this VPC. Default: eu-central-1a/b/c"
+  description = "The availability zones in this VPC. Default: us-west-2a/b/c/d"
 }
 
 variable "lan_subnets" {
-  default = ["10.250.1.0/24","10.250.2.0/24","10.250.3.0/24"]
+  default = ["10.250.1.0/24","10.250.2.0/24","10.250.3.0/24","10.250.4.0/24"]
   type = list(string)
-  description = "The internal/private networks. Defaults: 10.250.(1,2,3).0/24"
+  description = "The internal/private networks. Defaults: 10.250.(1,2,3,4).0/24"
 }
 
 variable "lan_subnets_name_tag" {
@@ -29,9 +29,9 @@ variable "lan_subnets_name_tag" {
 }
 
 variable "public_subnets" {
-  default = ["10.250.251.0/24","10.250.252.0/24","10.250.253.0/24"]
+  default = ["10.250.251.0/24","10.250.252.0/24","10.250.253.0/24","10.250.254.0/24"]
   type = list(string)
-  description = "The public network subnets. Defaults: 10.250.(251,252,253).0/24"
+  description = "The public network subnets. Defaults: 10.250.(251,252,253,254).0/24"
 }
 
 variable "public_subnets_name_tag" {

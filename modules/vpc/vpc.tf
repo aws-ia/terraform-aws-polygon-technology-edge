@@ -2,6 +2,7 @@
 resource "aws_vpc" "polygon_edge_vpc" {
   cidr_block = var.vpc_cidr_block
   instance_tenancy = "default"
+  enable_dns_hostnames = true
 
   tags = {
     Name = var.vpc_name_tag

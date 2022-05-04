@@ -12,7 +12,7 @@ resource "aws_iam_role_policy" "ec2_to_assm" {
           "ssm:GetParameter"
         ]
         Effect   = "Allow"
-        Resource = "arn:aws:ssm:eu-central-1:430792124313:parameter/polygon-edge/nodes/*"
+        Resource = format("arn:aws:ssm:%s:%s:parameter/polygon-edge/nodes/*", var.region, var.account_id)
       },
       {
         Action =  [

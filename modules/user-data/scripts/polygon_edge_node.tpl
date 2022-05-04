@@ -11,7 +11,7 @@ ASSM_PARAM_PATH="${assm_path}"
 ASSM_REGION="${assm_region}"
 IP="$(hostname -I)"
 
-CONTROLLER_IP="${controller_ip}"
+CONTROLLER_DNS="${controller_dns}"
 TOTAL_NODES="${total_nodes}"
 
 ## import ssh public key from bastion instance
@@ -63,7 +63,7 @@ then
                 echo "$EBS_DEVICE already has a file system! Skipping... ">> $LOG_FILE
         fi
         # If block ebs device exists and it has a filesystem, check if it is mounted and mount if it is not already mounted
-        if grep -qs '/dev/xvdf' /proc/mounts;
+        if grep -qs "$EBS_DEVICE" /proc/mounts;
         then
                 echo "EBS Volume already mounted. Skipping..." >> $LOG_FILE
         else
@@ -84,35 +84,17 @@ fi
 echo "--------------------------------------------------------------" >> $LOG_FILE
 echo "Getting polygon-edge binary ..." >> $LOG_FILE
 
-# wait for the system to fully boot up
-# wait for 60 seconds on the first node to give time for controller to boot up
-# the rest of the nodes are waiting for 120 sec.
-if [ "$NODE_NAME" = "node0" ]; 
-then
-        sleep 60
-else 
-        sleep 120
-fi
+# wait for system to fully boot
+sleep 60
+
 
 # get polygon-edge binary from github releases
-# mkdir /tmp/polygon-edge
-# wget https://github.com/0xPolygon/polygon-edge/releases/download/v0.3.2/polygon-edge_0.3.2_linux_amd64.tar.gz -O /tmp/polygon-edge/polygon-edge.tar.gz
-# tar -xvf /tmp/polygon-edge/polygon-edge.tar.gz -C /tmp/polygon-edge
-# sudo mv /tmp/polygon-edge/polygon-edge /usr/local/bin/
-# rm -R /tmp/polygon-edge
-
-## TEMP SOLUTION UNTIL WE GET A NEW RELEASE THAT FIXES AWS SSM 
-sudo snap install go --classic --channel=1.17
-git clone https://github.com/0xPolygon/polygon-edge /tmp/polygon-edge
-cd /tmp/polygon-edge && sudo go build -o artifacts/polygon-edge . && sudo mv artifacts/polygon-edge /usr/local/bin/ && cd -
+sudo apt update && sudo apt install -y jq
+mkdir /tmp/polygon-edge
+wget -q -O /tmp/polygon-edge/polygon-edge.tar.gz $(curl -s https://api.github.com/repos/0xPolygon/polygon-edge/releases/latest | jq .assets[3].browser_download_url  | tr -d '"')
+tar -xvf /tmp/polygon-edge/polygon-edge.tar.gz -C /tmp/polygon-edge
+sudo mv /tmp/polygon-edge/polygon-edge /usr/local/bin/
 rm -R /tmp/polygon-edge
-
-## Polygon Edge controller - it gets info from nodes when they are initialized and generates genesis.json
-git clone https://github.com/Trapesys/polygon-edge-assm /tmp/edge-assm
-cd /tmp/edge-assm && sudo go build -o artifacts/edge-assm . && sudo mv artifacts/edge-assm /usr/local/bin/ && cd -
-edge-assm &
-
-
 
 echo "--------------------------------------------------------------" >> $LOG_FILE
 echo "System init complete. Starting node initialization ..." >> $LOG_FILE
@@ -122,15 +104,15 @@ if [ "$(ls -A $DATA_FOLDER)" ]; then
         echo "Files in data dir found. Skipping Polygon edge initialization..." >> $LOG_FILE
 else
         echo "Starting node initialization" >> $LOG_FILE
-        /usr/local/bin/polygon-edge secrets generate --type aws-ssm --name "$NODE_NAME" --extra region="$ASSM_REGION",ssm-parameter-path="$ASSM_PARAM_PATH" --dir $POLYGON_FOLDER/secretsConfig.json
-        POLYGON=$(/usr/local/bin/polygon-edge secrets init --config $POLYGON_FOLDER/secretsConfig.json --json 2>&1)
+        /usr/local/bin/polygon-edge secrets generate --type aws-ssm --name "$NODE_NAME" --extra region="$ASSM_REGION",ssm-parameter-path="$ASSM_PARAM_PATH" --dir "$DATA_FOLDER/secretsConfig.json"
+        POLYGON=$(/usr/local/bin/polygon-edge secrets init --config $DATA_FOLDER/secretsConfig.json --json 2>&1)
         # Check if everything went ok
         if [ $? -eq 0 ]; then
                 echo "The initialization of polygon edge completed successfuly" >> $LOG_FILE
                 echo $POLYGON >> $NODE_INIT_FILE
-                curl "$CONTROLLER_IP:9001/total-nodes?total=$TOTAL_NODES" >> $LOG_FILE
-                curl -G -X GET --data-urlencode "name=$NODE_NAME" --data-urlencode "ip=$IP"  "$CONTROLLER_IP:9001/node-done" >> $LOG_FILE
-                curl "$CONTROLLER_IP:9001/init" >> $LOG_FILE
+                curl "$CONTROLLER_DNS:9001/total-nodes?total=$TOTAL_NODES" >> $LOG_FILE
+                curl -G -X GET --data-urlencode "name=$NODE_NAME" --data-urlencode "ip=$IP"  "$CONTROLLER_DNS:9001/node-done" >> $LOG_FILE
+                curl "$CONTROLLER_DNS:9001/init" >> $LOG_FILE
         else
                 echo "The initialization of polygon edge failed. Check log @ $LOG_FILE" >> $LOG_FILE
                 echo $POLYGON >> $LOG_FILE
