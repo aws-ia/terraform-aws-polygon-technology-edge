@@ -173,15 +173,15 @@ variable "alb_ssl_certificate" {
 variable "nodes_alb_name_prefix" {
   type        = string
   description = "ALB name"
-  default     = "polygon-edge-jsonrpc"
+  default     = "jrpc-"
 }
 variable "nodes_alb_name_tag" {
   type        = string
   description = "ALB name tag"
   default     = "Polygon Edge JSON-RPC ALB"
 }
-variable "nodes_alb_targetgroup_name" {
+variable "nodes_alb_targetgroup_name_prefix" {
   type        = string
   description = "ALB target group name"
-  default     = "polygon-edge-jsonrpc-"
+  default     = "jrpc-"
 }

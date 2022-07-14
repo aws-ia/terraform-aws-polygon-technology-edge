@@ -105,9 +105,9 @@ No resources.
 | <a name="input_max_slots"></a> [max\_slots](#input\_max\_slots) | Sets maximum slots in the pool | `string` | `""` | no |
 | <a name="input_nat_address"></a> [nat\_address](#input\_nat\_address) | Sets the NAT address for the networking package | `string` | `""` | no |
 | <a name="input_node_name_prefix"></a> [node\_name\_prefix](#input\_node\_name\_prefix) | The name prefix that will be used to store secrets | `string` | `"node"` | no |
-| <a name="input_nodes_alb_name_prefix"></a> [nodes\_alb\_name\_prefix](#input\_nodes\_alb\_name\_prefix) | ALB name | `string` | `"polygon-edge-jsonrpc"` | no |
+| <a name="input_nodes_alb_name_prefix"></a> [nodes\_alb\_name\_prefix](#input\_nodes\_alb\_name\_prefix) | ALB name | `string` | `"jrpc-"` | no |
 | <a name="input_nodes_alb_name_tag"></a> [nodes\_alb\_name\_tag](#input\_nodes\_alb\_name\_tag) | ALB name tag | `string` | `"Polygon Edge JSON-RPC ALB"` | no |
-| <a name="input_nodes_alb_targetgroup_name"></a> [nodes\_alb\_targetgroup\_name](#input\_nodes\_alb\_targetgroup\_name) | ALB target group name | `string` | `"polygon-edge-jsonrpc-"` | no |
+| <a name="input_nodes_alb_targetgroup_name_prefix"></a> [nodes\_alb\_targetgroup\_name\_prefix](#input\_nodes\_alb\_targetgroup\_name\_prefix) | ALB target group name | `string` | `"jrpc-"` | no |
 | <a name="input_polygon_edge_dir"></a> [polygon\_edge\_dir](#input\_polygon\_edge\_dir) | The directory to place all polygon-edge data and logs | `string` | `"/home/ubuntu/polygon"` | no |
 | <a name="input_price_limit"></a> [price\_limit](#input\_price\_limit) | Sets minimum gas price limit to enforce for acceptance into the pool | `string` | `""` | no |
 | <a name="input_prometheus_address"></a> [prometheus\_address](#input\_prometheus\_address) | Enable Prometheus API | `string` | `""` | no |

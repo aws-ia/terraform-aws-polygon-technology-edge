@@ -103,7 +103,7 @@ module "alb" {
   node_ids            = [for _, instance in module.instances : instance.instance_id]
   alb_ssl_certificate = var.alb_ssl_certificate
 
-  nodes_alb_name                    = var.nodes_alb_name_prefix
+  nodes_alb_name_prefix             = var.nodes_alb_name_prefix
   nodes_alb_name_tag                = var.nodes_alb_name_tag
-  nodes_alb_targetgroup_name_prefix = var.nodes_alb_targetgroup_name
+  nodes_alb_targetgroup_name_prefix = var.nodes_alb_targetgroup_name_prefix
 }

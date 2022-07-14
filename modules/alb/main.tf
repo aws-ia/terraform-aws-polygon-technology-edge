@@ -1,6 +1,6 @@
 # Create new ALB
 resource "aws_lb" "polygon_nodes" {
-  name = var.nodes_alb_name
+  name_prefix = var.nodes_alb_name_prefix
   #tfsec:ignore:aws-elb-alb-not-public
   internal                   = false
   load_balancer_type         = "application"

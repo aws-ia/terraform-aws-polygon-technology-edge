@@ -1,4 +1,4 @@
-variable "nodes_alb_name" {
+variable "nodes_alb_name_prefix" {
   type        = string
   description = "ALB name"
 }
