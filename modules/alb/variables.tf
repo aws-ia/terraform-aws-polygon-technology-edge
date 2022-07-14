@@ -14,7 +14,7 @@ variable "alb_sec_group" {
   type        = string
   description = "The security group to place the ALB in"
 }
-variable "nodes_alb_targetgroup_name" {
+variable "nodes_alb_targetgroup_name_prefix" {
   type        = string
   description = "ALB target group name"
 }

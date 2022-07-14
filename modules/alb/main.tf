@@ -15,10 +15,10 @@ resource "aws_lb" "polygon_nodes" {
 }
 # Create new ALB Target Group
 resource "aws_lb_target_group" "polygon_nodes" {
-  name     = var.nodes_alb_targetgroup_name
-  port     = 8545
-  protocol = "HTTP"
-  vpc_id   = var.vpc_id
+  name_prefix = var.nodes_alb_targetgroup_name_prefix
+  port        = 8545
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
 }
 
 # Set http listener on ALB

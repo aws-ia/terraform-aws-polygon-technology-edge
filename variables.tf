@@ -170,7 +170,7 @@ variable "alb_ssl_certificate" {
   type        = string
   description = "SSL certificate ARN for JSON-RPC loadblancer"
 }
-variable "nodes_alb_name" {
+variable "nodes_alb_name_prefix" {
   type        = string
   description = "ALB name"
   default     = "polygon-edge-jsonrpc"
