@@ -16,15 +16,15 @@ resource "aws_lb" "polygon_nodes" {
 # Create new ALB Target Group
 resource "aws_lb_target_group" "polygon_nodes" {
   name     = var.nodes_alb_targetgroup_name
-  port     = var.nodes_alb_targetgroup_port
-  protocol = var.nodes_alb_targetgroup_proto
+  port     = 8545
+  protocol = "HTTP"
   vpc_id   = var.vpc_id
 }
 
 # Set http listener on ALB
 resource "aws_lb_listener" "polygon_nodes_http" {
   load_balancer_arn = aws_lb.polygon_nodes.arn
-  port              = var.nodes_alb_listener_port
+  port              = 80
   protocol          = "HTTP"
 
   default_action {
@@ -58,5 +58,5 @@ resource "aws_lb_target_group_attachment" "polygon_nodes" {
 
   target_group_arn = aws_lb_target_group.polygon_nodes.arn
   target_id        = var.node_ids[count.index]
-  port             = var.nodes_alb_targetgroup_port
+  port             = 8545
 }

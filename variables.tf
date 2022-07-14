@@ -175,7 +175,6 @@ variable "nodes_alb_name" {
   description = "ALB name"
   default     = "polygon-edge-jsonrpc"
 }
-
 variable "nodes_alb_name_tag" {
   type        = string
   description = "ALB name tag"
@@ -185,19 +184,4 @@ variable "nodes_alb_targetgroup_name" {
   type        = string
   description = "ALB target group name"
   default     = "polygon-edge-jsonrpc-"
-}
-variable "nodes_alb_targetgroup_port" {
-  type        = number
-  description = "The port for json-rpc api exposed on the nodes"
-  default     = 8545
-}
-variable "nodes_alb_targetgroup_proto" {
-  type        = string
-  description = "The protocol for json-rpc API"
-  default     = "HTTP"
-}
-variable "nodes_alb_listener_port" {
-  type        = number
-  description = "The port on whitch ALB will listen on"
-  default     = 80
 }

@@ -18,21 +18,9 @@ variable "nodes_alb_targetgroup_name" {
   type        = string
   description = "ALB target group name"
 }
-variable "nodes_alb_targetgroup_port" {
-  type        = number
-  description = "The port for json-rpc api exposed on the nodes"
-}
-variable "nodes_alb_targetgroup_proto" {
-  type        = string
-  description = "The protocol for json-rpc API"
-}
 variable "vpc_id" {
   type        = string
   description = "VPC id"
-}
-variable "nodes_alb_listener_port" {
-  type        = number
-  description = "The port on whitch ALB will listen on"
 }
 variable "node_ids" {
   type        = list(string)
