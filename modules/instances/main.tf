@@ -7,7 +7,8 @@ resource "aws_instance" "polygon_edge_instance" {
   iam_instance_profile = var.instance_iam_role
 
   metadata_options {
-    http_tokens = "required"
+    http_tokens   = "required"
+    http_endpoint = "enabled"
   }
 
   root_block_device {
