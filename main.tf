@@ -1,136 +1,113 @@
 module "vpc" {
-  source = "./modules/vpc"
+  source  = "aws-ia/vpc/aws"
+  version = ">= 1.4.1"
 
-  /**
-    vpc_cidr_block
-    vpc_name_tag
-    az
-    lan_subnets
-    lan_subnets_name_tag
-    public_subnets
-    public_subnets_name_tag
-    nat_gateway_name_tag
-    default_route_name_tag
-  */
+  name       = var.vpc_name
+  cidr_block = var.vpc_cidr_block
+  az_count   = 4
+
+  subnets = {
+    public = {
+      netmask                   = 24
+      nat_gateway_configuration = "all_azs"
+    }
+
+    private = {
+      netmask      = 24
+      route_to_nat = true
+    }
+  }
+
+  vpc_flow_logs = {
+    log_destination_type = "cloud-watch-logs"
+    retention_in_days    = 180
+  }
+}
+
+module "s3" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = ">= 3.3.0"
+
+  bucket_prefix = var.s3_bucket_prefix
+  acl           = "private"
 }
 
 module "security" {
   source = "./modules/security"
-  vpc_id = module.vpc.vpc_id
 
-  ssh_key_name = var.ssh_key_name
-  ssh_public_key = var.ssh_public_key
-
-  admin_public_ip = var.admin_ip
-  account_id= var.account_id
-
-  /**
-    internal_sec_gr_name_tag
-    region
-  */
-}
-
-module "s3" {
-  source = "./modules/s3"
-  vpc_id = module.vpc.vpc_id
-
-  /**
-    bucket_name_tag
-    bucket_name
-  */
+  vpc_id                   = module.vpc.vpc_attributes.id
+  account_id               = var.account_id
+  s3_shared_bucket_name    = module.s3.s3_bucket_id
+  ssm_parameter_id         = var.ssm_parameter_id
+  region                   = var.region
+  internal_sec_gr_name_tag = var.internal_sec_gr_name_tag
+  alb_sec_gr_name_tag      = var.alb_sec_gr_name_tag
 }
 
 module "instances" {
   source = "./modules/instances"
 
-  count = 4
-  node_index = count.index
-  ssh_key_name = module.security.ssh_key_name
-  internal_subnet = module.vpc.internal_subnets[count.index]
-  internal_sec_groups = [module.security.internal_sec_group_id]
-  user_data_base64 = module.user_data[count.index].polygon_edge_node
-  instance_iam_role = module.security.ec2_to_assm_iam_policy_id
-  az = module.vpc.av_zones[count.index]
+  for_each = module.vpc.private_subnet_attributes_by_az
 
-  depends_on = [module.bastion_instance.instance_dns_name]
-  /**
-    instance_type
-    user_data_base64
-    ebs_root_name_tag
-    instance_name
-    instance_interface_name_tag
-    chain_data_ebs_volume_size
-    chain_data_ebs_name_tag
-  */
-}
-module "bastion_instance" {
-  source = "./modules/instances"
-
-  ssh_key_name = module.security.ssh_key_name
-  internal_subnet = module.vpc.external_subnets[0]
-  internal_sec_groups = [module.security.bastion_public_id]
-  instance_iam_role = module.security.ec2_to_assm_iam_policy_id
-
-  instance_name = "Polygon_Edge_Bastion"
-  instance_type = "t2.micro"
-  polygon_edge_instance_type = false
-  user_data_base64 = module.user_data[0].bastion
+  internal_subnet             = each.value.id
+  internal_sec_groups         = [module.security.internal_sec_group_id]
+  user_data_base64            = module.user_data[each.key].polygon_edge_node
+  instance_iam_role           = module.security.ec2_to_assm_iam_policy_id
+  az                          = each.key
+  instance_type               = var.instance_type
+  instance_name               = var.instance_name
+  ebs_root_name_tag           = var.ebs_root_name_tag
+  instance_interface_name_tag = var.instance_interface_name_tag
+  chain_data_ebs_volume_size  = var.chain_data_ebs_volume_size
+  chain_data_ebs_name_tag     = var.chain_data_ebs_name_tag
 }
 
 module "user_data" {
   source = "./modules/user-data"
 
-  count = 4
-  bastion_private_key = var.BASTION_PRIV_KEY
-  node_name = "node${count.index}"
-  controller_dns =  module.bastion_instance.instance_dns_name
+  for_each  = module.vpc.private_subnet_attributes_by_az
+  node_name = "${var.node_name_prefix}-${each.key}"
 
-  // Chain options
-  premine = var.premine
+  assm_path      = var.ssm_parameter_id
+  assm_region    = var.region
+  s3_bucket_name = module.s3.s3_bucket_id
+  total_nodes    = length(module.vpc.private_subnet_attributes_by_az)
 
-  // Server non-required options
-  /**
-  max_slots
-  block_time
-  prometheus_address
-  block_gas_target
-  nat_address
-  dns_name
-  price_limit
-  */
+  polygon_edge_dir = var.polygon_edge_dir
+  ebs_device       = var.ebs_device
 
-  // Chain non-required options
-  /**
-    chain_name
-    chain_id
-    block_gas_limit
-    epoch_size
-  */
+  # Server configuration
 
-  /**
-    total_nodes
-    polygon_edge_dir
-    ebs_device
-    assm_path 
-    assm_region
-    s3_bucket_name
-  */
+  max_slots          = var.max_slots
+  block_time         = var.block_time
+  prometheus_address = var.prometheus_address
+  block_gas_target   = var.block_gas_target
+  nat_address        = var.nat_address
+  dns_name           = var.dns_name
+  price_limit        = var.price_limit
+
+  #  # Chain configuration
+  #  premine         = var.premine
+  #  chain_name      = var.chain_name
+  #  chain_id        = var.chain_id
+  #  block_gas_limit = var.block_gas_limit
+  #  epoch_size      = var.epoch_size
 }
 
 module "alb" {
   source = "./modules/alb"
 
-  public_subnets = module.vpc.external_subnets
-  alb_sec_group = module.security.jsonrpc_sec_group_id
-  vpc_id = module.vpc.vpc_id
-  node_ids = module.instances[*].instance_ids
+  public_subnets      = [for _, value in module.vpc.public_subnet_attributes_by_az : value.id]
+  alb_sec_group       = module.security.jsonrpc_sec_group_id
+  vpc_id              = module.vpc.vpc_attributes.id
+  node_ids            = [for _, instance in module.instances : instance.instance_id]
+  alb_ssl_certificate = var.alb_ssl_certificate
 
-/**
-  nodes_nlb_name
-  nodes_nlg_name_tag
-  nodes_nlb_targetgroup_name
-  nodes_nlb_targetgroup_port
-  nodes_nlb_targetgroup_proto
-  nodes_nlb_listener_port
-*/  
+  nodes_alb_name              = var.nodes_alb_name
+  nodes_alb_name_tag          = var.nodes_alb_name_tag
+  nodes_alb_targetgroup_name  = var.nodes_alb_targetgroup_name
+  nodes_alb_targetgroup_port  = var.nodes_alb_targetgroup_port
+  nodes_alb_targetgroup_proto = var.nodes_alb_targetgroup_proto
+  nodes_alb_listener_port     = var.nodes_alb_listener_port
+
 }

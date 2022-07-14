@@ -40,3 +40,5 @@ terraform.rc
 
 # Ignore custom aws profile file
 aws.profile.tf
+
+.idea

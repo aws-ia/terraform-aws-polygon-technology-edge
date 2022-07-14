@@ -1,55 +1,44 @@
 variable "nodes_alb_name" {
-  type = string
+  type        = string
   description = "ALB name"
-  default = "polygon-edge-jsonrpc"
 }
-
 variable "nodes_alb_name_tag" {
-  type = string
+  type        = string
   description = "ALB name tag"
-  default = "Polygon Edge JSON-RPC ALB"
 }
-
 variable "public_subnets" {
-  type = list(any)
+  type        = list(string)
   description = "The list of public subnets"
 }
-
 variable "alb_sec_group" {
-  type = string
+  type        = string
   description = "The security group to place the ALB in"
 }
-
-variable "nodes_nlb_targetgroup_name" {
-  type = string
+variable "nodes_alb_targetgroup_name" {
+  type        = string
   description = "ALB target group name"
-  default = "polygon-edge-jsonrpc-targetgroup"
 }
-
-variable "nodes_nlb_targetgroup_port" {
-  type = number
+variable "nodes_alb_targetgroup_port" {
+  type        = number
   description = "The port for json-rpc api exposed on the nodes"
-  default = 8545
 }
-
-variable "nodes_nlb_targetgroup_proto" {
-  type = string
+variable "nodes_alb_targetgroup_proto" {
+  type        = string
   description = "The protocol for json-rpc API"
-  default = "HTTP"
 }
-
 variable "vpc_id" {
-  type = string
+  type        = string
   description = "VPC id"
 }
-
-variable "nodes_nlb_listener_port" {
-  type = number
+variable "nodes_alb_listener_port" {
+  type        = number
   description = "The port on whitch ALB will listen on"
-  default = 80
 }
-
 variable "node_ids" {
-  type = list(string)
+  type        = list(string)
   description = "The ids of the nodes to place in targetgroup"
+}
+variable "alb_ssl_certificate" {
+  type        = string
+  description = "The SSL certificate ARN for JSON-RPC load balancer"
 }
