@@ -9,6 +9,10 @@ terraform {
       source  = "hashicorp/awscc"
       version = ">= 0.27.0"
     }
+    null = {
+      source  = "hashicorp/null"
+      version = ">=3.1.1"
+    }
   }
 }
 

@@ -92,6 +92,39 @@ tar -xvf /tmp/polygon-edge/polygon-edge.tar.gz -C /tmp/polygon-edge
 sudo mv /tmp/polygon-edge/polygon-edge /usr/local/bin/
 rm -R /tmp/polygon-edge
 
+# install awscli so that we can call Lambda function
+sudo apt update && sudo apt install -y awscli
+
+# create json lambda query
+jsonLambda=$(cat <<EOF
+{
+  "config": {
+	  "aws_region": "$ASSM_REGION",
+	  "s3_bucket_name": "${s3_bucket_name}",
+	  "s3_key_name": "${s3_key_name}",
+
+    "premine": "${premine}",
+    "chain_name": "${chain_name}",
+	  "chain_id": "${chain_id}",
+	  "pos": ${pos},
+	  "epoch_size": "${epoch_size}",
+	  "block_gas_limit": "${block_gas_limit}",
+	  "max_validator_count": "${max_validator_count}",
+	  "min_validator_count": "${min_validator_count}",
+	  "consensus": "${consensus}"
+  },
+  "nodes": {
+	  "total": $TOTAL_NODES,
+	  "node_info": {
+      "ssm_param_id": "${assm_path}",
+        "node_name": "$NODE_NAME",
+        "ip": "$IP"
+	  }
+  }
+}
+EOF
+)
+
 echo "--------------------------------------------------------------" >> "$LOG_FILE"
 echo "System init complete. Starting node initialization ..." >> "$LOG_FILE"
 
@@ -104,11 +137,7 @@ else
         POLYGON=$(/usr/local/bin/polygon-edge secrets init --config "$DATA_FOLDER"/secretsConfig.json --json 2>&1)
         # Check if everything went ok
         if [ $? -eq 0 ]; then
-                echo "The initialization of polygon edge completed successfully" >> "$LOG_FILE"
-                echo "$POLYGON" >> "$NODE_INIT_FILE"
-                curl "$CONTROLLER_DNS:9001/total-nodes?total=$TOTAL_NODES" >> $LOG_FILE
-                curl -G -X GET --data-urlencode "name=$NODE_NAME" --data-urlencode "ip=$IP"  "$CONTROLLER_DNS:9001/node-done" >> "$LOG_FILE"
-                curl "$CONTROLLER_DNS:9001/init" >> "$LOG_FILE"
+            aws lambda invoke --function-name "${lambda_function_name}" --region "$ASSM_REGION" --payload "$jsonLambda" "$LOGS_FOLDER/lambda.json"
         else
                 echo "The initialization of polygon edge failed. Check log @ $LOG_FILE" >> "$LOG_FILE"
                 echo "$POLYGON" >> "$LOG_FILE"

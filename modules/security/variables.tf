@@ -32,3 +32,8 @@ variable "alb_sec_gr_name_tag" {
   type        = string
   description = "The name tag for ALB security group"
 }
+
+variable "lambda_function_name" {
+  type        = string
+  description = "The name of the chain initialization Lambda function"
+}

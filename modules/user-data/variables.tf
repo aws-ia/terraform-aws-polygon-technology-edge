@@ -28,26 +28,42 @@ variable "s3_bucket_name" {
 }
 
 ## genesis options
-#variable "chain_name" {
-#  type        = string
-#  description = "Set the name of chain"
-#}
-#variable "chain_id" {
-#  type        = string
-#  description = "Set the Chain ID"
-#}
-#variable "block_gas_limit" {
-#  type        = string
-#  description = "Set the block gas limit"
-#}
-#variable "premine" {
-#  type        = string
-#  description = "Premine the accounts with the specified ammount."
-#}
-#variable "epoch_size" {
-#  type        = string
-#  description = "Set the epoch size"
-#}
+variable "chain_name" {
+  type        = string
+  description = "Set the name of chain"
+}
+variable "chain_id" {
+  type        = string
+  description = "Set the Chain ID"
+}
+variable "block_gas_limit" {
+  type        = string
+  description = "Set the block gas limit"
+}
+variable "premine" {
+  type        = string
+  description = "Premine the accounts with the specified ammount."
+}
+variable "epoch_size" {
+  type        = string
+  description = "Set the epoch size"
+}
+variable "pos" {
+  type        = bool
+  description = "Deploy with PoS consensus"
+}
+variable "max_validator_count" {
+  type        = string
+  description = "Maximum number of stakers able to join the validator set in a PoS consensus."
+}
+variable "min_validator_count" {
+  type        = string
+  description = "Minimum number of stakers needed to join the validator set in a PoS consensus."
+}
+variable "consensus" {
+  type        = string
+  description = "Sets the consensus protocol"
+}
 
 # server options
 variable "prometheus_address" {
@@ -77,4 +93,14 @@ variable "max_slots" {
 variable "block_time" {
   type        = string
   description = "Set block production time in seconds"
+}
+
+variable "lambda_function_name" {
+  type        = string
+  description = "The name of the chain init Lambda function"
+}
+
+variable "s3_key_name" {
+  type        = string
+  description = "Name for the config file stored in S3"
 }

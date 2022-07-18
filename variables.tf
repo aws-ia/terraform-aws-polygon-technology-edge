@@ -16,6 +16,16 @@ variable "s3_bucket_prefix" {
   type        = string
   default     = "polygon-edge-shared-"
 }
+variable "s3_force_destroy" {
+  type        = bool
+  default     = true
+  description = "Delete S3 bucket on destroy, even if the bucket is not empty"
+}
+variable "s3_key_name" {
+  type        = string
+  description = "Name of the file in S3 that will hold configuration"
+  default     = "chain-config"
+}
 
 # SECURITY
 variable "account_id" {
@@ -98,36 +108,56 @@ variable "node_name_prefix" {
   description = "The name prefix that will be used to store secrets"
   default     = "node"
 }
-#
+
 ## GENESIS
-#variable "chain_name" {
-#  type        = string
-#  description = "Set the name of chain"
-#  default     = ""
-#}
-#
-#variable "chain_id" {
-#  type        = string
-#  description = "Set the Chain ID"
-#  default     = ""
-#}
-#
-#variable "block_gas_limit" {
-#  type        = string
-#  description = "Set the block gas limit"
-#  default     = ""
-#}
-#
-#variable "premine" {
-#  type        = string
-#  description = "Premine the accounts with the specified ammount. Format: account:ammount,account:ammount"
-#}
-#
-#variable "epoch_size" {
-#  type        = string
-#  description = "Set the epoch size"
-#  default     = ""
-#}
+variable "chain_name" {
+  type        = string
+  description = "Set the name of chain"
+  default     = ""
+}
+
+variable "chain_id" {
+  type        = string
+  description = "Set the Chain ID"
+  default     = ""
+}
+
+variable "block_gas_limit" {
+  type        = string
+  description = "Set the block gas limit"
+  default     = ""
+}
+
+variable "premine" {
+  type        = string
+  description = "Premine the accounts with the specified ammount. Format: account:ammount,account:ammount"
+}
+
+variable "epoch_size" {
+  type        = string
+  description = "Set the epoch size"
+  default     = ""
+}
+variable "consensus" {
+  type        = string
+  description = "Sets consensus protocol."
+  default     = ""
+}
+variable "max_validator_count" {
+  type        = string
+  description = "The maximum number of stakers able to join the validator set in a PoS consensus."
+  default     = ""
+}
+variable "min_validator_count" {
+  type        = string
+  description = "The minimum number of stakers needed to join the validator set in a PoS consensus."
+  default     = ""
+}
+variable "pos" {
+  type        = bool
+  description = "Use PoS IBFT consensus"
+  default     = false
+}
 # server options
 variable "prometheus_address" {
   type        = string
@@ -184,4 +214,10 @@ variable "nodes_alb_targetgroup_name_prefix" {
   type        = string
   description = "ALB target group name"
   default     = "jrpc-"
+}
+# LAMBDA
+variable "lambda_function_name" {
+  type        = string
+  description = "The name of the Lambda function used for chain init"
+  default     = "polygon-edge-init"
 }

@@ -30,6 +30,7 @@ module "s3" {
 
   bucket_prefix = var.s3_bucket_prefix
   acl           = "private"
+  force_destroy = var.s3_force_destroy
 }
 
 module "security" {
@@ -42,6 +43,7 @@ module "security" {
   region                   = var.region
   internal_sec_gr_name_tag = var.internal_sec_gr_name_tag
   alb_sec_gr_name_tag      = var.alb_sec_gr_name_tag
+  lambda_function_name     = var.lambda_function_name
 }
 
 module "instances" {
@@ -60,6 +62,8 @@ module "instances" {
   instance_interface_name_tag = var.instance_interface_name_tag
   chain_data_ebs_volume_size  = var.chain_data_ebs_volume_size
   chain_data_ebs_name_tag     = var.chain_data_ebs_name_tag
+
+  depends_on = [module.lambda]
 }
 
 module "user_data" {
@@ -71,6 +75,7 @@ module "user_data" {
   assm_path      = var.ssm_parameter_id
   assm_region    = var.region
   s3_bucket_name = module.s3.s3_bucket_id
+  s3_key_name    = var.s3_key_name
   total_nodes    = length(module.vpc.private_subnet_attributes_by_az)
 
   polygon_edge_dir = var.polygon_edge_dir
@@ -87,11 +92,17 @@ module "user_data" {
   price_limit        = var.price_limit
 
   #  # Chain configuration
-  #  premine         = var.premine
-  #  chain_name      = var.chain_name
-  #  chain_id        = var.chain_id
-  #  block_gas_limit = var.block_gas_limit
-  #  epoch_size      = var.epoch_size
+  premine              = var.premine
+  chain_name           = var.chain_name
+  chain_id             = var.chain_id
+  block_gas_limit      = var.block_gas_limit
+  epoch_size           = var.epoch_size
+  consensus            = var.consensus
+  lambda_function_name = var.lambda_function_name
+  max_validator_count  = var.max_validator_count
+  min_validator_count  = var.min_validator_count
+  pos                  = var.pos
+
 }
 
 module "alb" {
@@ -106,4 +117,76 @@ module "alb" {
   nodes_alb_name_prefix             = var.nodes_alb_name_prefix
   nodes_alb_name_tag                = var.nodes_alb_name_tag
   nodes_alb_targetgroup_name_prefix = var.nodes_alb_targetgroup_name_prefix
+}
+
+locals {
+  package_url = "https://raw.githubusercontent.com/Trapesys/polygon-edge-assm/aws-lambda/artifacts/main.zip"
+  downloaded  = "main.zip"
+}
+
+resource "null_resource" "download_package" {
+  triggers = {
+    downloaded = local.downloaded
+  }
+
+  provisioner "local-exec" {
+    command = "curl -L -o ${local.downloaded} ${local.package_url}"
+  }
+}
+
+data "null_data_source" "downloaded_package" {
+  inputs = {
+    id       = null_resource.download_package.id
+    filename = local.downloaded
+  }
+}
+
+module "lambda" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = ">=3.3.1"
+
+  function_name = var.lambda_function_name
+  description   = "Lambda function used to initialize chain and generate genesis.json"
+  handler       = "main"
+  runtime       = "go1.x"
+  timeout       = 20
+  memory_size   = 256
+
+  create_package         = false
+  local_existing_package = data.null_data_source.downloaded_package.outputs["filename"]
+
+  attach_policy_jsons    = true
+  number_of_policy_jsons = 2
+  policy_jsons = [jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:ListBucket"
+        ],
+        Resource = [
+          "arn:aws:s3:::${module.s3.s3_bucket_id}",
+          "arn:aws:s3:::${module.s3.s3_bucket_id}/*"
+        ]
+      }
+    ]
+    }), jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:GetParametersByPath"
+        ],
+        Resource = [
+          "arn:aws:ssm:${var.region}:${var.account_id}:parameter/${var.ssm_parameter_id}/*"
+        ]
+      }
+    ]
+  })]
 }

@@ -27,7 +27,12 @@ resource "aws_iam_role_policy" "polygon_edge_node" {
         Action   = ["s3:ListBucket"]
         Effect   = "Allow",
         Resource = [format("arn:aws:s3:::%s", var.s3_shared_bucket_name)]
-      }
+      },
+      {
+        Action   = ["lambda:InvokeFunction"]
+        Effect   = "Allow"
+        Resource = format("arn:aws:lambda:%s:%s:function:%s", var.region, var.account_id, var.lambda_function_name)
+      },
     ]
   })
 }
