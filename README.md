@@ -3,32 +3,69 @@
   <img src="https://raw.githubusercontent.com/0xPolygon/polygon-edge/develop/.github/banner.jpg" alt="Polygon Edge" width="100%">
 </p>
 
-## Polygon Edge
+# <center>Polygon Edge AWS Terraform</center>
 
 Polygon Edge is a modular and extensible framework for building Ethereum-compatible blockchain networks.
 
 To find out more about Polygon, visit the [official website](https://polygon.technology/).
 
-## Documentation 📝
+### Documentation 📝
 
 If you'd like to learn more about the Polygon Edge, how it works and how you can use it for your project,
-please check out the **[Polygon Edge Documentation](https://sdk-docs.polygon.technology)**.
+please check out the **[Polygon Edge Documentation](https://docs.polygon.technology/docs/edge/overview/)**.
 
----
+## Terraform deployment
 
-Copyright 2022 Polygon Technology
+This is a fully automated Polygon Edge blockchain infrastructure deployment for AWS cloud provider.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+High level overview of the resources that will be deployed:
+* Dedicated VPC
+* 4 validator nodes (which are also boot nodes)
+* 4 NAT gateways to allow nodes outbound internet traffic
+* Lambda function used for generating the first (`genesis`) block and starting the chain
+* Dedicated security groups and IAM roles
+* S3 bucket used for storing `genesis.json` file
+* Application Load Balancer used for exposing the `JSON-RPC` endpoint
 
-       http://www.apache.org/licenses/LICENSE-2.0
+### Prerequisites
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+Three variables that must be provided, before running the deployment:
+
+* `account_id` - the AWS account ID that the Polygon Edge blockchain cluster will be deployed on.
+* `alb_ssl_certificate` - the ARN of the certificate from AWS Certificate Manager to be used by ALB for https protocol.   
+  The certificate must be generated before starting the deployment, and it must have **Issued** status.
+* `premine` - the account/s that will receive pre mined native currency.
+  Value must follow the official [CLI](https://docs.polygon.technology/docs/edge/get-started/cli-commands#genesis-flags) flag specification.
+
+### Fault tolerance
+
+Only regions that have 4 availability zones are required for this deployment. Each node is deployed in a single AZ.
+
+By placing each node in a single AZ, the whole blockchain cluster is fault-tolerant to a single node (AZ) failure, as Polygon Edge implements IBFT
+consensus which allows a single node to fail in a 4 validator node cluster.
+
+### Command line access
+
+Validator nodes are not exposed in any way to the public internet (JSON-PRC is accessed only via ALB)
+and they don't even have public IP addresses attached to them.  
+Nodes command line access is possible only via ***AWS Systems Manager - Session Manager***.
+
+### Base AMI upgrade
+
+This deployment uses `ubuntu-focal-20.04-amd64-server` AWS AMI. It will **not** trigger EC2 *redeployment* if the AWS AMI gets updated.
+
+If, for some reason, base AMI is required to get updated,
+it can be achieved by running `terraform taint` command for each instance, before `terraform apply`.   
+Instances can be tainted by running the `terraform taint module.instances[<AZ>].aws_instance.polygon_edge_instance` command,
+where `<AZ>` is the availability zone
+Example with default configuration:
+```shell
+terraform taint module.instances[\"us-west-2a\"].aws_instance.polygon_edge_instance
+terraform taint module.instances[\"us-west-2b\"].aws_instance.polygon_edge_instance
+terraform taint module.instances[\"us-west-2c\"].aws_instance.polygon_edge_instance
+terraform taint module.instances[\"us-west-2d\"].aws_instance.polygon_edge_instance
+terraform apply
+```
 
 ## Requirements
 
