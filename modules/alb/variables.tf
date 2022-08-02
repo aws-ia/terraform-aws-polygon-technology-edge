@@ -8,7 +8,7 @@ variable "nodes_alb_name_tag" {
 }
 variable "public_subnets" {
   type        = list(string)
-  description = "The list of public subnets"
+  description = "The list of public subnet IDs"
 }
 variable "alb_sec_group" {
   type        = string

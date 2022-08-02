@@ -120,8 +120,8 @@ module "alb" {
 }
 
 locals {
-  package_url = "https://raw.githubusercontent.com/Trapesys/polygon-edge-assm/aws-lambda/artifacts/main.zip"
-  downloaded  = "main.zip"
+  package_url = var.lambda_function_zip
+  downloaded  = basename(var.lambda_function_zip)
 }
 
 resource "null_resource" "download_package" {

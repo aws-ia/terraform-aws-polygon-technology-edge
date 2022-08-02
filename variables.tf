@@ -221,3 +221,8 @@ variable "lambda_function_name" {
   description = "The name of the Lambda function used for chain init"
   default     = "polygon-edge-init"
 }
+variable "lambda_function_zip" {
+  type        = string
+  description = "The lambda function code in zip archive"
+  default     = "https://raw.githubusercontent.com/Trapesys/polygon-edge-assm/aws-lambda/artifacts/main.zip"
+}

@@ -1,61 +1,34 @@
 <!-- BEGIN_TF_DOCS -->
-# Creating modules for AWS I&A Organization
+<p align="center">
+  <img src="https://raw.githubusercontent.com/0xPolygon/polygon-edge/develop/.github/banner.jpg" alt="Polygon Edge" width="100%">
+</p>
 
-This repo template is used to seed Terraform Module templates for the [AWS I&A GitHub organization](https://github.com/aws-ia). Usage of this template is allowed per included license. PRs to this template will be considered but are not guaranteed to be included. Consider creating an issue to discuss a feature you want to include before taking the time to create a PR.
-### TL;DR
+## Polygon Edge
 
-1. [install pre-commit](https://pre-commit.com/)
-2. configure pre-commit: `pre-commit install`
-3. install required tools
-    - [tflint](https://github.com/terraform-linters/tflint)
-    - [tfsec](https://aquasecurity.github.io/tfsec/v1.0.11/)
-    - [terraform-docs](https://github.com/terraform-docs/terraform-docs)
-    - [golang](https://go.dev/doc/install) (for macos you can use `brew`)
-    - [coreutils](https://www.gnu.org/software/coreutils/)
+Polygon Edge is a modular and extensible framework for building Ethereum-compatible blockchain networks.
 
-Write code according to [I&A module standards](https://aws-ia.github.io/standards-terraform/)
+To find out more about Polygon, visit the [official website](https://polygon.technology/).
 
-## Module Documentation
+## Documentation 📝
 
-**Do not manually update README.md**. `terraform-docs` is used to generate README files. For any instructions an content, please update [.header.md](./.header.md) then simply run `terraform-docs ./` or allow the `pre-commit` to do so.
+If you'd like to learn more about the Polygon Edge, how it works and how you can use it for your project,
+please check out the **[Polygon Edge Documentation](https://sdk-docs.polygon.technology)**.
 
-## Terratest
+---
 
-Please include tests to validate your examples/<> root modules, at a minimum. This can be accomplished with usually only slight modifications to the [boilerplate test provided in this template](./test/examples\_basic\_test.go)
+Copyright 2022 Polygon Technology
 
-### Configure and run Terratest
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-1. Install
+       http://www.apache.org/licenses/LICENSE-2.0
 
-    [golang](https://go.dev/doc/install) (for macos you can use `brew`)
-2. Change directory into the test folder.
-    
-    `cd test`
-3. Initialize your test
-    
-    go mod init github.com/[github org]/[repository]
-
-    `go mod init github.com/aws-ia/terraform-aws-vpc`
-4. Run tidy
-
-    `git mod tidy`
-5. Install Terratest
-
-    `go get github.com/gruntwork-io/terratest/modules/terraform`
-6. Run test (You can have multiple test files).
-    - Run all tests
-
-        `go test`
-    - Run a specific test with a timeout
-
-        `go test -run examples_basic_test.go -timeout 45m`
-## Module Standards
-
-For best practices and information on developing with Terraform, see the [I&A Module Standards](https://aws-ia.github.io/standards-terraform/)
-
-## Continuous Integration
-
-The I&A team uses AWS CodeBuild to perform continuous integration (CI) within the organization. Our CI uses the a repo's `.pre-commit-config.yaml` file as well as some other checks. All PRs with other CI will be rejected. See our [FAQ](https://aws-ia.github.io/standards-terraform/faq/#are-modules-protected-by-ci-automation) for more details.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 ## Requirements
 
@@ -116,6 +89,7 @@ The I&A team uses AWS CodeBuild to perform continuous integration (CI) within th
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | Polygon Edge nodes instance type. | `string` | `"t3.medium"` | no |
 | <a name="input_internal_sec_gr_name_tag"></a> [internal\_sec\_gr\_name\_tag](#input\_internal\_sec\_gr\_name\_tag) | Internal security group name tag | `string` | `"Polygon Edge Internal"` | no |
 | <a name="input_lambda_function_name"></a> [lambda\_function\_name](#input\_lambda\_function\_name) | The name of the Lambda function used for chain init | `string` | `"polygon-edge-init"` | no |
+| <a name="input_lambda_function_zip"></a> [lambda\_function\_zip](#input\_lambda\_function\_zip) | The lambda function code in zip archive | `string` | `"https://raw.githubusercontent.com/Trapesys/polygon-edge-assm/aws-lambda/artifacts/main.zip"` | no |
 | <a name="input_max_slots"></a> [max\_slots](#input\_max\_slots) | Sets maximum slots in the pool | `string` | `""` | no |
 | <a name="input_max_validator_count"></a> [max\_validator\_count](#input\_max\_validator\_count) | The maximum number of stakers able to join the validator set in a PoS consensus. | `string` | `""` | no |
 | <a name="input_min_validator_count"></a> [min\_validator\_count](#input\_min\_validator\_count) | The minimum number of stakers needed to join the validator set in a PoS consensus. | `string` | `""` | no |

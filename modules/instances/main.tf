@@ -18,6 +18,10 @@ resource "aws_instance" "polygon_edge_instance" {
     }
   }
 
+  lifecycle {
+    ignore_changes = [ami]
+  }
+
   tags = {
     Name = var.instance_name
   }
