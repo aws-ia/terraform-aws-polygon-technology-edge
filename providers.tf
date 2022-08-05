@@ -16,15 +16,3 @@ terraform {
   }
 }
 
-provider "awscc" {
-  user_agent = [{
-    product_name    = "terraform-polygon-technology-edge"
-    product_version = "0.0.1"
-    comment         = "V1/AWS-D69B4015/478186123"
-  }]
-  region = var.region
-}
-
-provider "aws" {
-  region = var.region
-}
