@@ -1,6 +1,6 @@
 module "vpc" {
   source  = "aws-ia/vpc/aws"
-  version = ">= 1.4.1"
+  version = "= 1.4.1"
 
   name       = var.vpc_name
   cidr_block = var.vpc_cidr_block
