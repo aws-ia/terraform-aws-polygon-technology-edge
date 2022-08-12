@@ -67,6 +67,13 @@ terraform taint module.instances[\"us-west-2d\"].aws_instance.polygon_edge_insta
 terraform apply
 ```
 
+### Deployment
+
+VPC must be created beforehand, as the instances are deployed using a loop which must know all
+AZ names in advance.
+
+To do this, simply run `terraform apply -target=module.vpc` and then `terraform apply` after it.
+
 ## Requirements
 
 | Name | Version |
@@ -92,7 +99,7 @@ terraform apply
 | <a name="module_s3"></a> [s3](#module\_s3) | terraform-aws-modules/s3-bucket/aws | >= 3.3.0 |
 | <a name="module_security"></a> [security](#module\_security) | ./modules/security | n/a |
 | <a name="module_user_data"></a> [user\_data](#module\_user\_data) | ./modules/user-data | n/a |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | >= 1.4.1 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | = 1.4.1 |
 
 ## Resources
 
