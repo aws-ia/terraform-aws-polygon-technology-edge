@@ -33,7 +33,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_polygon-edge"></a> [polygon-edge](#module\_polygon-edge) | aws-ia/polygon-technology-edge/aws | 0.0.1 |
+| <a name="module_polygon-edge"></a> [polygon-edge](#module\_polygon-edge) | aws-ia/polygon-technology-edge/aws | >=0.0.1 |
 
 ## Resources
 

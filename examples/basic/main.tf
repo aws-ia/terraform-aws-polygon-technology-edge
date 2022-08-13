@@ -1,6 +1,6 @@
 module "polygon-edge" {
   source  = "aws-ia/polygon-technology-edge/aws"
-  version = "0.0.1"
+  version = ">=0.0.1"
 
   account_id          = var.account_id
   premine             = var.premine
