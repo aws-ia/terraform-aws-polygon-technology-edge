@@ -1,6 +1,6 @@
 module "vpc" {
   source  = "aws-ia/vpc/aws"
-  version = ">= 1.4.1"
+  version = "= 1.4.1"
 
   name       = var.vpc_name
   cidr_block = var.vpc_cidr_block
@@ -22,6 +22,17 @@ module "vpc" {
     log_destination_type = "cloud-watch-logs"
     retention_in_days    = 180
   }
+}
+
+locals {
+  package_url     = var.lambda_function_zip
+  downloaded      = basename(var.lambda_function_zip)
+  azs             = slice(data.aws_availability_zones.current.names, 0, 4)
+  private_subnets = [for _, value in module.vpc.private_subnet_attributes_by_az : value.id]
+  private_azs = {
+    for idx, az_name in local.azs : idx => az_name
+  }
+
 }
 
 module "s3" {
@@ -49,13 +60,13 @@ module "security" {
 module "instances" {
   source = "./modules/instances"
 
-  for_each = module.vpc.private_subnet_attributes_by_az
+  for_each = local.private_azs
 
-  internal_subnet             = each.value.id
+  internal_subnet             = local.private_subnets[each.key]
   internal_sec_groups         = [module.security.internal_sec_group_id]
   user_data_base64            = module.user_data[each.key].polygon_edge_node
   instance_iam_role           = module.security.ec2_to_assm_iam_policy_id
-  az                          = each.key
+  az                          = each.value
   instance_type               = var.instance_type
   instance_name               = var.instance_name
   ebs_root_name_tag           = var.ebs_root_name_tag
@@ -69,8 +80,8 @@ module "instances" {
 module "user_data" {
   source = "./modules/user-data"
 
-  for_each  = module.vpc.private_subnet_attributes_by_az
-  node_name = "${var.node_name_prefix}-${each.key}"
+  for_each  = local.private_azs
+  node_name = "${var.node_name_prefix}-${each.value}"
 
   assm_path      = var.ssm_parameter_id
   assm_region    = var.region
@@ -119,10 +130,7 @@ module "alb" {
   nodes_alb_targetgroup_name_prefix = var.nodes_alb_targetgroup_name_prefix
 }
 
-locals {
-  package_url = var.lambda_function_zip
-  downloaded  = basename(var.lambda_function_zip)
-}
+
 
 resource "null_resource" "download_package" {
   triggers = {
@@ -131,13 +139,6 @@ resource "null_resource" "download_package" {
 
   provisioner "local-exec" {
     command = "curl -L -o ${local.downloaded} ${local.package_url}"
-  }
-}
-
-data "null_data_source" "downloaded_package" {
-  inputs = {
-    id       = null_resource.download_package.id
-    filename = local.downloaded
   }
 }
 

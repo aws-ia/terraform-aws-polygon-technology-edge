@@ -3,7 +3,7 @@
   <img src="https://raw.githubusercontent.com/0xPolygon/polygon-edge/develop/.github/banner.jpg" alt="Polygon Edge" width="100%">
 </p>
 
-# <center>Polygon Edge AWS Terraform</center>
+# Polygon Edge AWS Terraform
 
 Polygon Edge is a modular and extensible framework for building Ethereum-compatible blockchain networks.
 
@@ -56,16 +56,22 @@ This deployment uses `ubuntu-focal-20.04-amd64-server` AWS AMI. It will **not** 
 
 If, for some reason, base AMI is required to get updated,
 it can be achieved by running `terraform taint` command for each instance, before `terraform apply`.   
-Instances can be tainted by running the `terraform taint module.instances[<AZ>].aws_instance.polygon_edge_instance` command,
-where `<AZ>` is the availability zone
-Example with default configuration:
+Instances can be tainted by running the `terraform taint module.instances[<instance_number>].aws_instance.polygon_edge_instance` command.
+
+Example:
 ```shell
-terraform taint module.instances[\"us-west-2a\"].aws_instance.polygon_edge_instance
-terraform taint module.instances[\"us-west-2b\"].aws_instance.polygon_edge_instance
-terraform taint module.instances[\"us-west-2c\"].aws_instance.polygon_edge_instance
-terraform taint module.instances[\"us-west-2d\"].aws_instance.polygon_edge_instance
+terraform taint module.instances[0].aws_instance.polygon_edge_instance
+terraform taint module.instances[1].aws_instance.polygon_edge_instance
+terraform taint module.instances[2].aws_instance.polygon_edge_instance
+terraform taint module.instances[3].aws_instance.polygon_edge_instance
 terraform apply
 ```
+
+### Resources cleanup
+
+When cleaning up all resources by running `terraform destory`, the only thing that needs to be manually deleted
+are **validator keys** from **AWS SSM Parameter Store** as they are not stored via Terraform, but with `polygon-edge`
+process itself.
 
 ## Requirements
 
@@ -80,6 +86,7 @@ terraform apply
 
 | Name | Version |
 |------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.22.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | >=3.1.1 |
 
 ## Modules
@@ -92,13 +99,14 @@ terraform apply
 | <a name="module_s3"></a> [s3](#module\_s3) | terraform-aws-modules/s3-bucket/aws | >= 3.3.0 |
 | <a name="module_security"></a> [security](#module\_security) | ./modules/security | n/a |
 | <a name="module_user_data"></a> [user\_data](#module\_user\_data) | ./modules/user-data | n/a |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | >= 1.4.1 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | = 1.4.1 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
 | [null_resource.download_package](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [aws_availability_zones.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 | [null_data_source.downloaded_package](https://registry.terraform.io/providers/hashicorp/null/latest/docs/data-sources/data_source) | data source |
 
 ## Inputs
