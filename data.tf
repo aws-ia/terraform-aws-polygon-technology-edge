@@ -13,18 +13,12 @@ data "aws_iam_policy_document" "genesis_s3" {
   statement {
     actions = [
       "s3:PutObject",
-      "s3:GetObject"
-    ]
-    resources = [
-      "${module.s3.s3_bucket_arn}/*"
-    ]
-  }
-  statement {
-    actions = [
+      "s3:GetObject",
       "s3:ListBucket"
     ]
     resources = [
-      module.s3.s3_bucket_arn
+      module.s3.s3_bucket_arn,
+      "${module.s3.s3_bucket_arn}/*"
     ]
   }
 }
