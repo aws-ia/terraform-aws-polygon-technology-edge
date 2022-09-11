@@ -44,13 +44,13 @@ data "aws_iam_policy_document" "polygon_edge_node" {
   }
 }
 
-resource "aws_iam_policy_document" "ec2_trust" {
+data "aws_iam_policy_document" "ec2_trust" {
   version = "2012-10-17"
   statement {
     actions = [
       "sts:AssumeRole"
     ]
-    principal {
+    principals {
       type = "Service"
       identifiers = [
         "ec2.amazonaws.com"

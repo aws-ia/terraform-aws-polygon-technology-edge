@@ -144,7 +144,7 @@ resource "null_resource" "download_package" {
 
 module "lambda" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "4.0.1"
+  version = ">=3.3.1"
 
   function_name = var.lambda_function_name
   description   = "Lambda function used to initialize chain and generate genesis.json"

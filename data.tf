@@ -10,7 +10,7 @@ data "aws_availability_zones" "current" {}
 
 data "aws_iam_policy_document" "genesis_s3" {
   version = "2012-10-17"
-  statements {
+  statement {
     actions = [
       "s3:PutObject",
       "s3:GetObject"
@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "genesis_s3" {
       "${module.s3.s3_bucket_arn}/*"
     ]
   }
-  statements {
+  statement {
     actions = [
       "s3:ListBucket"
     ]
@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "genesis_s3" {
 
 data "aws_iam_policy_document" "genesis_ssm" {
   version = "2012-10-17"
-  statements {
+  statement {
     actions = [
       "ssm:GetParameter",
       "ssm:GetParameters",

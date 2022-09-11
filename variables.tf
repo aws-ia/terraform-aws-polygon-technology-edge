@@ -44,7 +44,7 @@ variable "region" {
   # must deploy in a 4 AZ region
   validation {
     condition     = contains(["us-west-2", "us-east-1", "ap-northeast-2", "ap-northeast-1"], var.region)
-    error_message = "The deployment must be done in 4 AZ region"
+    error_message = "The deployment must be done in 4 AZ region."
   }
 }
 variable "internal_sec_gr_name_tag" {
