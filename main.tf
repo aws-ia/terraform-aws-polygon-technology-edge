@@ -158,36 +158,5 @@ module "lambda" {
 
   attach_policy_jsons    = true
   number_of_policy_jsons = 2
-  policy_jsons = [jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "s3:PutObject",
-          "s3:GetObject",
-          "s3:ListBucket"
-        ],
-        Resource = [
-          "arn:aws:s3:::${module.s3.s3_bucket_id}",
-          "arn:aws:s3:::${module.s3.s3_bucket_id}/*"
-        ]
-      }
-    ]
-    }), jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "ssm:GetParameter",
-          "ssm:GetParameters",
-          "ssm:GetParametersByPath"
-        ],
-        Resource = [
-          "arn:aws:ssm:${var.region}:${var.account_id}:parameter/${var.ssm_parameter_id}/*"
-        ]
-      }
-    ]
-  })]
+  policy_jsons           = [data.aws_iam_policy_document.genesis_s3.json, data.aws_iam_policy_document.genesis_ssm.json]
 }
