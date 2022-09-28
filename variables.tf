@@ -28,24 +28,10 @@ variable "s3_key_name" {
 }
 
 # SECURITY
-variable "account_id" {
-  description = "The AWS account number"
-  type        = string
-}
 variable "ssm_parameter_id" {
   description = "The id that will be used for storing and fetching from SSM Parameter Store"
   type        = string
   default     = "polygon-edge-validators"
-}
-variable "region" {
-  description = "AWS region"
-  type        = string
-  default     = "us-west-2"
-  # must deploy in a 4 AZ region
-  validation {
-    condition     = contains(["us-west-2", "us-east-1", "ap-northeast-2", "ap-northeast-1"], var.region)
-    error_message = "The deployment must be done in 4 AZ region."
-  }
 }
 variable "internal_sec_gr_name_tag" {
   type        = string
