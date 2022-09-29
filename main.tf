@@ -48,10 +48,10 @@ module "security" {
   source = "./modules/security"
 
   vpc_id                   = module.vpc.vpc_attributes.id
-  account_id               = var.account_id
+  account_id               = data.aws_caller_identity.current.account_id
   s3_shared_bucket_name    = module.s3.s3_bucket_id
   ssm_parameter_id         = var.ssm_parameter_id
-  region                   = var.region
+  region                   = data.aws_region.current.name
   internal_sec_gr_name_tag = var.internal_sec_gr_name_tag
   alb_sec_gr_name_tag      = var.alb_sec_gr_name_tag
   lambda_function_name     = var.lambda_function_name
@@ -84,7 +84,7 @@ module "user_data" {
   node_name = "${var.node_name_prefix}-${each.value}"
 
   assm_path      = var.ssm_parameter_id
-  assm_region    = var.region
+  assm_region    = data.aws_region.current.name
   s3_bucket_name = module.s3.s3_bucket_id
   s3_key_name    = var.s3_key_name
   total_nodes    = length(module.vpc.private_subnet_attributes_by_az)

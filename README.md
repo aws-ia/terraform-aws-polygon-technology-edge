@@ -77,9 +77,11 @@ process itself.
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1.0, < 1.3.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.22.0 |
 | <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.27.0 |
+| <a name="requirement_external"></a> [external](#requirement\_external) | >= 2.2.2 |
+| <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.2.3 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >=3.1.1 |
 
 ## Providers
@@ -107,15 +109,16 @@ process itself.
 |------|------|
 | [null_resource.download_package](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [aws_availability_zones.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
+| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.genesis_s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.genesis_ssm](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 | [null_data_source.downloaded_package](https://registry.terraform.io/providers/hashicorp/null/latest/docs/data-sources/data_source) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_account_id"></a> [account\_id](#input\_account\_id) | The AWS account number | `string` | n/a | yes |
 | <a name="input_alb_ssl_certificate"></a> [alb\_ssl\_certificate](#input\_alb\_ssl\_certificate) | SSL certificate ARN for JSON-RPC loadblancer | `string` | n/a | yes |
 | <a name="input_premine"></a> [premine](#input\_premine) | Premine the accounts with the specified ammount. Format: account:ammount,account:ammount | `string` | n/a | yes |
 | <a name="input_alb_sec_gr_name_tag"></a> [alb\_sec\_gr\_name\_tag](#input\_alb\_sec\_gr\_name\_tag) | External security group name tag | `string` | `"Polygon Edge External"` | no |
@@ -149,7 +152,6 @@ process itself.
 | <a name="input_pos"></a> [pos](#input\_pos) | Use PoS IBFT consensus | `bool` | `false` | no |
 | <a name="input_price_limit"></a> [price\_limit](#input\_price\_limit) | Sets minimum gas price limit to enforce for acceptance into the pool | `string` | `""` | no |
 | <a name="input_prometheus_address"></a> [prometheus\_address](#input\_prometheus\_address) | Enable Prometheus API | `string` | `""` | no |
-| <a name="input_region"></a> [region](#input\_region) | AWS region | `string` | `"us-west-2"` | no |
 | <a name="input_s3_bucket_prefix"></a> [s3\_bucket\_prefix](#input\_s3\_bucket\_prefix) | Name prefix for new S3 bucket | `string` | `"polygon-edge-shared-"` | no |
 | <a name="input_s3_force_destroy"></a> [s3\_force\_destroy](#input\_s3\_force\_destroy) | Delete S3 bucket on destroy, even if the bucket is not empty | `bool` | `true` | no |
 | <a name="input_s3_key_name"></a> [s3\_key\_name](#input\_s3\_key\_name) | Name of the file in S3 that will hold configuration | `string` | `"chain-config"` | no |
