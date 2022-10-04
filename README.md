@@ -29,9 +29,8 @@ High level overview of the resources that will be deployed:
 
 ### Prerequisites
 
-Three variables that must be provided, before running the deployment:
+Two variables that must be provided, before running the deployment:
 
-* `account_id` - the AWS account ID that the Polygon Edge blockchain cluster will be deployed on.
 * `alb_ssl_certificate` - the ARN of the certificate from AWS Certificate Manager to be used by ALB for https protocol.   
   The certificate must be generated before starting the deployment, and it must have **Issued** status.
 * `premine` - the account/s that will receive pre mined native currency.
