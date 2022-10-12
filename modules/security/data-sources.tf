@@ -39,7 +39,7 @@ data "aws_iam_policy_document" "polygon_edge_node" {
       "lambda:InvokeFunction"
     ]
     resources = [
-      "arn:aws:lambda:${var.region}:${var.account_id}:function/${var.lambda_function_name}"
+      "arn:aws:lambda:${var.region}:${var.account_id}:function:${var.lambda_function_name}"
     ]
   }
 }
