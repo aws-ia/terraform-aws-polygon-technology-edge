@@ -77,7 +77,7 @@ process itself.
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1.0, < 1.3.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.22.0 |
 | <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.27.0 |
 | <a name="requirement_external"></a> [external](#requirement\_external) | >= 2.2.2 |
@@ -101,7 +101,7 @@ process itself.
 | <a name="module_s3"></a> [s3](#module\_s3) | terraform-aws-modules/s3-bucket/aws | >= 3.3.0 |
 | <a name="module_security"></a> [security](#module\_security) | ./modules/security | n/a |
 | <a name="module_user_data"></a> [user\_data](#module\_user\_data) | ./modules/user-data | n/a |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | = 1.4.1 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | >= 3.0.1 |
 
 ## Resources
 
