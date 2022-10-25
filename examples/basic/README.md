@@ -43,7 +43,6 @@ No resources.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_account_id"></a> [account\_id](#input\_account\_id) | Your AWS Account ID | `string` | n/a | yes |
 | <a name="input_alb_ssl_certificate"></a> [alb\_ssl\_certificate](#input\_alb\_ssl\_certificate) | The ARN of SSL certificate that will be placed on JSON-RPC ALB | `string` | n/a | yes |
 | <a name="input_premine"></a> [premine](#input\_premine) | Public account that will receive premined native currency | `string` | n/a | yes |
 

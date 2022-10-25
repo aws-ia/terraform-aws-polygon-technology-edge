@@ -1,8 +1,3 @@
-variable "account_id" {
-  type        = string
-  description = "Your AWS Account ID"
-}
-
 variable "premine" {
   type        = string
   description = "Public account that will receive premined native currency"
