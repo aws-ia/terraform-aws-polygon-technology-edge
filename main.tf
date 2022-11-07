@@ -1,6 +1,6 @@
 module "vpc" {
   source  = "aws-ia/vpc/aws"
-  version = ">= 3.0.1"
+  version = "= 1.4.1"
 
   name       = var.vpc_name
   cidr_block = var.vpc_cidr_block
@@ -13,8 +13,8 @@ module "vpc" {
     }
 
     private = {
-      netmask                 = 24
-      connect_to_public_natgw = true
+      netmask      = 24
+      route_to_nat = true
     }
   }
 
