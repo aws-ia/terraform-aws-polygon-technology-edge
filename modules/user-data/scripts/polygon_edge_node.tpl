@@ -83,17 +83,16 @@ echo "Getting polygon-edge binary ..." >> "$LOG_FILE"
 # wait for system to fully boot
 sleep 60
 
+# install packages
+sudo apt update && sudo apt install -y jq awscli
 
-# get polygon-edge binary from github releases
-sudo apt update && sudo apt install -y jq
+# get polygon-edge binary from github releases #77894422 - v0.5.1
 mkdir /tmp/polygon-edge
-wget -q -O /tmp/polygon-edge/polygon-edge.tar.gz "$(curl -s https://api.github.com/repos/0xPolygon/polygon-edge/releases/latest | jq .assets[3].browser_download_url  | tr -d '"')"
+wget -q -O /tmp/polygon-edge/polygon-edge.tar.gz "$(curl -s https://api.github.com/repos/0xPolygon/polygon-edge/releases/77894422 | jq .assets[3].browser_download_url  | tr -d '"')"
 tar -xvf /tmp/polygon-edge/polygon-edge.tar.gz -C /tmp/polygon-edge
 sudo mv /tmp/polygon-edge/polygon-edge /usr/local/bin/
 rm -R /tmp/polygon-edge
 
-# install awscli so that we can call Lambda function
-sudo apt update && sudo apt install -y awscli
 
 # create json lambda query
 jsonLambda=$(cat <<EOF
