@@ -26,18 +26,18 @@ locals {
 
 
   polygon_edge_server = templatefile(
-  "${path.module}/scripts/polygon_edge_server.tpl",
-  {
-    "polygon_edge_dir"   = var.polygon_edge_dir
-    "s3_bucket_name"     = var.s3_bucket_name
-    "prometheus_address" = var.prometheus_address
-    "block_gas_target"   = var.block_gas_target
-    "nat_address"        = var.nat_address
-    "dns_name"           = var.dns_name
-    "price_limit"        = var.price_limit
-    "max_slots"          = var.max_slots
-    "block_time"         = var.block_time
-  }
+    "${path.module}/scripts/polygon_edge_server.tpl",
+    {
+      "polygon_edge_dir"   = var.polygon_edge_dir
+      "s3_bucket_name"     = var.s3_bucket_name
+      "prometheus_address" = var.prometheus_address
+      "block_gas_target"   = var.block_gas_target
+      "nat_address"        = var.nat_address
+      "dns_name"           = var.dns_name
+      "price_limit"        = var.price_limit
+      "max_slots"          = var.max_slots
+      "block_time"         = var.block_time
+    }
   )
 }
 
