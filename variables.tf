@@ -212,3 +212,24 @@ variable "lambda_function_zip" {
   description = "The lambda function code in zip archive"
   default     = "https://raw.githubusercontent.com/Trapesys/polygon-edge-assm/aws-lambda/artifacts/main.zip"
 }
+
+#blockscout
+variable "blockscout_alb_ssl_certificate" {
+  type        = string
+  description = "SSL certificate ARN for JSON-RPC Blockscout loadblancer"
+}
+variable "blockscout_nodes_alb_name_prefix" {
+  type        = string
+  description = "ALB name"
+  default     = "blck-"
+}
+variable "blockscout_nodes_alb_name_tag" {
+  type        = string
+  description = "ALB name tag"
+  default     = "Blockscout JSON-RPC ALB"
+}
+variable "blockscout_nodes_alb_targetgroup_name_prefix" {
+  type        = string
+  description = "ALB target group name"
+  default     = "blck-"
+}

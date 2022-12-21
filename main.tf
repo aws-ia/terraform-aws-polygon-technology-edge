@@ -160,3 +160,33 @@ module "lambda" {
   number_of_policy_jsons = 2
   policy_jsons           = [data.aws_iam_policy_document.genesis_s3.json, data.aws_iam_policy_document.genesis_ssm.json]
 }
+
+module "blockscout_instance" {
+  source    = "./modules/blockscout"
+  vpc_id    = module.vpc.vpc_attributes.id
+  subnet_id = local.private_subnets[0]
+  ### Polygon options ###
+  s3_bucket_name     = module.s3.s3_bucket_id
+  polygon_edge_dir   = var.polygon_edge_dir
+  max_slots          = var.max_slots
+  block_time         = var.block_time
+  prometheus_address = var.prometheus_address
+  block_gas_target   = var.block_gas_target
+  nat_address        = var.nat_address
+  dns_name           = var.dns_name
+  price_limit        = var.price_limit
+}
+
+module "blockscout_alb" {
+  source = "./modules/alb"
+
+  public_subnets      = [for _, value in module.vpc.public_subnet_attributes_by_az : value.id]
+  alb_sec_group       = module.blockscout_instance.sg_lb_id
+  vpc_id              = module.vpc.vpc_attributes.id
+  node_ids            = [module.blockscout_instance.instance_id]
+  alb_ssl_certificate = var.blockscout_alb_ssl_certificate
+
+  nodes_alb_name_prefix             = var.blockscout_nodes_alb_name_prefix
+  nodes_alb_name_tag                = var.blockscout_nodes_alb_name_tag
+  nodes_alb_targetgroup_name_prefix = var.blockscout_nodes_alb_targetgroup_name_prefix
+}
