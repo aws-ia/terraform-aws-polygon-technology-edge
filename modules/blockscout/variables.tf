@@ -63,8 +63,9 @@ variable "subnet_id" {
 }
 
 variable "tags" {
-  type    = any
-  default = {}
+  type        = any
+  default     = {}
+  description = "Tags"
 }
 
 variable "vpc_id" {
