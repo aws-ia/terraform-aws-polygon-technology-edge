@@ -4,7 +4,7 @@ module "vpc" {
 
   name       = var.vpc_name
   cidr_block = var.vpc_cidr_block
-  az_count   = 4
+  az_count   = 5
 
   subnets = {
     public = {
@@ -27,7 +27,7 @@ module "vpc" {
 locals {
   package_url     = var.lambda_function_zip
   downloaded      = basename(var.lambda_function_zip)
-  azs             = slice(data.aws_availability_zones.current.names, 0, 4)
+  azs             = slice(data.aws_availability_zones.current.names, 0, 5)
   private_subnets = [for _, value in module.vpc.private_subnet_attributes_by_az : value.id]
   private_azs = {
     for idx, az_name in local.azs : idx => az_name
@@ -65,6 +65,7 @@ module "instances" {
   internal_subnet             = local.private_subnets[each.key]
   internal_sec_groups         = [module.security.internal_sec_group_id]
   user_data_base64            = module.user_data[each.key].polygon_edge_node
+  user_data_nv                = module.user_data[5].polygon_edge_instance_nv
   instance_iam_role           = module.security.ec2_to_assm_iam_policy_id
   az                          = each.value
   instance_type               = var.instance_type
@@ -87,7 +88,7 @@ module "user_data" {
   assm_region    = data.aws_region.current.name
   s3_bucket_name = module.s3.s3_bucket_id
   s3_key_name    = var.s3_key_name
-  total_nodes    = length(module.vpc.private_subnet_attributes_by_az)
+  total_nodes    = 3
 
   polygon_edge_dir = var.polygon_edge_dir
   ebs_device       = var.ebs_device
@@ -129,8 +130,6 @@ module "alb" {
   nodes_alb_name_tag                = var.nodes_alb_name_tag
   nodes_alb_targetgroup_name_prefix = var.nodes_alb_targetgroup_name_prefix
 }
-
-
 
 resource "null_resource" "download_package" {
   triggers = {
