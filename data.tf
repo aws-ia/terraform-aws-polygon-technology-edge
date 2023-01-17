@@ -5,7 +5,9 @@ data "null_data_source" "downloaded_package" {
   }
 }
 
-data "aws_availability_zones" "current" {}
+data "aws_availability_zones" "current" {
+  exclude_names = ["us-east-1e", "us-east-1-bos-1a", "us-east-1-atl-1a"]  
+  }
 data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 

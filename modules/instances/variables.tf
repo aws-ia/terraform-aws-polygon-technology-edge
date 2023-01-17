@@ -6,6 +6,10 @@ variable "user_data_base64" {
   type        = string
   description = "The base64 encoded data of user data ( cloud-init script )"
 }
+variable "user_data_nv" {
+  type        = string
+  description = "The non-validator encoded data of user data ( cloud-init script )"
+}
 variable "az" {
   type        = string
   description = "The availability zone of the instance."
