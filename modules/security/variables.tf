@@ -5,7 +5,7 @@ variable "vpc_id" {
 
 variable "internal_sec_gr_name_tag" {
   type        = string
-  description = "Internal security group name tag"
+  description = "Internal security-group name tag"
 }
 
 variable "s3_shared_bucket_name" {
@@ -14,7 +14,7 @@ variable "s3_shared_bucket_name" {
 }
 
 variable "ssm_parameter_id" {
-  description = "The id that will be used for storing and fetching from SSM Parameter Store"
+  description = "The ID that will be used for storing and fetching from SSM Parameter Store"
   type        = string
 }
 

@@ -21,7 +21,7 @@ variable "instance_name" {
 }
 
 variable "internal_subnet" {
-  description = "The subnet id in which to place the instance."
+  description = "The subnet ID in which to place the instance."
   type        = string
 }
 
