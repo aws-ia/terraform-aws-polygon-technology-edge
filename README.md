@@ -1,60 +1,63 @@
 <!-- BEGIN_TF_DOCS -->
-<p align="center">
-  <img src="https://raw.githubusercontent.com/0xPolygon/polygon-edge/develop/.github/banner.jpg" alt="Polygon Edge" width="100%">
-</p>
+# Polygon Edge Partner Solution on AWS—Terraform module
 
-# Polygon Edge AWS Terraform
+This Partner Solution uses a Terraform module to deploy a dedicated [Polygon Edge](https://polygon.technology/solutions/polygon-edge/) blockchain to the Amazon Web Services (AWS) Cloud using the proof-of-authority consensus mechanism. This solution is for developers of enterprise decentralized applications (dApps) who want to design, develop, and test blockchain applications.
 
-Polygon Edge is a modular and extensible framework for building Ethereum-compatible blockchain networks.
+For more information, refer to the [Polygon Edge documentation](https://docs.polygon.technology/docs/edge/overview/).
 
-To find out more about Polygon, visit the [official website](https://polygon.technology/).
+This Partner Solution was developed by Polygon in collaboration with AWS. Polygon is an [AWS Partner](https://partners.amazonaws.com/).
 
-### Documentation 📝
+## Costs and licenses
 
-If you'd like to learn more about the Polygon Edge, how it works and how you can use it for your project,
-please check out the **[Polygon Edge Documentation](https://docs.polygon.technology/docs/edge/overview/)**.
+There is no cost to use this Partner Solution, but you'll be billed for any AWS services or resources that this Partner Solution deploys. For more information, refer to the [AWS Partner Solution General Information Guide](https://fwd.aws/rA69w?).
 
-## Terraform deployment
+## Architecture
 
-This is a fully automated Polygon Edge blockchain infrastructure deployment for AWS cloud provider.
+This Partner Solution deploys into a new virtual private cloud (VPC).
 
-High level overview of the resources that will be deployed:
-* Dedicated VPC
-* 4 validator nodes (which are also boot nodes)
-* 4 NAT gateways to allow nodes outbound internet traffic
-* Lambda function used for generating the first (`genesis`) block and starting the chain
-* Dedicated security groups and IAM roles
-* S3 bucket used for storing `genesis.json` file
-* Application Load Balancer used for exposing the `JSON-RPC` endpoint
+![Architecture for Polygon Edge on AWS](https://github.com/aws-ia/terraform-aws-polygon-technology-edge/blob/main/images/polygon-architecture-diagram.png)
 
-### Prerequisites
+As shown in the diagram, this solution sets up the following:
 
-Two variables that must be provided, before running the deployment:
+* A highly available architecture that spans four Availability Zones.
+* A VPC configured with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS.
+* In the public subnets, managed NAT gateways to allow outbound internet access for resources in the private subnets.
+* In the private subnets, Polygon Edge deployed to Amazon Elastic Compute Cloud (Amazon EC2) instances, one per Availability Zone. These nodes serve as blockchain validators.
+* An Application Load Balancer to distribute JSON-RPC requests across the Polygon Edge nodes.
+* Amazon CloudWatch to monitor the VPC and generate flow logs.
+* AWS Systems Manager to securely store each Polygon Edge node's validator keys in a Parameter Store and to update and manage the nodes.
+* AWS Lambda to generate the genesis.json file that bootstraps the Polygon Edge nodes.
+* A private, encrypted Amazon Simple Storage Service (Amazon S3) bucket to share the genesis file among the Polygon Edge nodes.
+* AWS PrivateLink (not shown) for connecting to Amazon S3 and Systems Manager services over private networking.
+* Dedicated security groups and IAM roles (not shown).
 
-* `alb_ssl_certificate` - the ARN of the certificate from AWS Certificate Manager to be used by ALB for https protocol.   
-  The certificate must be generated before starting the deployment, and it must have **Issued** status.
-* `premine` - the account/s that will receive pre mined native currency.
-  Value must follow the official [CLI](https://docs.polygon.technology/docs/edge/get-started/cli-commands#genesis-flags) flag specification.
+## Prerequisites
 
-### Fault tolerance
+Before you deploy this solution, you must provide these variables:
 
-Only regions that have 4 availability zones are required for this deployment. Each node is deployed in a single AZ.
+* `account_id`—The AWS account ID that the Polygon Edge blockchain cluster will be deployed on.
+* `alb_ssl_certificate`—The Amazon Resource Name (ARN) of the certificate from AWS Certificate Manager to be used by the Application Load Balancer for https protocol.
+The certificate must be generated before starting the deployment, and it must have an **Issued** status.
+* `premine`—The account or accounts that will receive premined native currency.
+Value must follow the official [CLI flag specification](https://docs.polygon.technology/docs/edge/get-started/cli-commands#genesis-flags).
 
-By placing each node in a single AZ, the whole blockchain cluster is fault-tolerant to a single node (AZ) failure, as Polygon Edge implements IBFT
-consensus which allows a single node to fail in a 4 validator node cluster.
+## Fault tolerance
 
-### Command line access
+This deployment requires AWS Regions that have 4 Availability Zones. Each node is deployed in a single Availability Zone, making the whole blockchain cluster fault-tolerant to a single node (Availability Zone) failure since Polygon Edge implements IBFT consensus.
+This allows a single node to fail in a four-validator-node cluster.
 
-Validator nodes are not exposed in any way to the public internet (JSON-PRC is accessed only via ALB)
-and they don't even have public IP addresses attached to them.  
-Nodes command line access is possible only via ***AWS Systems Manager - Session Manager***.
+## Command-line access
 
-### Base AMI upgrade
+Validator nodes are not exposed to the public internet (JSON-PRC is accessed only by the Application Load Balancer).
+They don't even have public IP addresses attached to them.  
+The nodes' command-line access is possible only by AWS Systems Manager Session Manager.
 
-This deployment uses `ubuntu-focal-20.04-amd64-server` AWS AMI. It will **not** trigger EC2 *redeployment* if the AWS AMI gets updated.
+## Base AMI upgrade
 
-If, for some reason, base AMI is required to get updated,
-it can be achieved by running `terraform taint` command for each instance, before `terraform apply`.   
+This deployment uses the `ubuntu-focal-20.04-amd64-server` AWS AMI. It will not trigger EC2 redeployment if the AWS AMI gets updated.
+
+If the base AMI must be updated,
+you can update it by running the `terraform taint` command for each instance before `terraform apply`.   
 Instances can be tainted by running the `terraform taint module.instances[<instance_number>].aws_instance.polygon_edge_instance` command.
 
 Example:
@@ -66,11 +69,18 @@ terraform taint module.instances[3].aws_instance.polygon_edge_instance
 terraform apply
 ```
 
-### Resources cleanup
+## Usage
 
-When cleaning up all resources by running `terraform destory`, the only thing that needs to be manually deleted
-are **validator keys** from **AWS SSM Parameter Store** as they are not stored via Terraform, but with `polygon-edge`
+<!--- Shivansh, You mentioned that every Terraform readme should have a "Usage" section with copy-paste code. Please advise. (Shivansh says, "Seems partner has missed it. Let me add and submit a PR.")--->
+
+## Cleanup
+
+When cleaning up all resources by running `terraform destroy`, the only things you must delete manually
+are **validator keys** from **AWS SSM Parameter Store** since they are not stored using Terraform but with the `polygon-edge`
 process itself.
+
+## Customer responsibility
+After you deploy this Partner Solution, confirm that your resources and services are updated and configured—including any required patches—to meet your security and other needs. For more information, refer to the [AWS Shared Responsibility Model](https://aws.amazon.com/compliance/shared-responsibility-model/).
 
 ## Requirements
 
@@ -118,15 +128,15 @@ process itself.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_alb_ssl_certificate"></a> [alb\_ssl\_certificate](#input\_alb\_ssl\_certificate) | SSL certificate ARN for JSON-RPC loadblancer | `string` | n/a | yes |
-| <a name="input_premine"></a> [premine](#input\_premine) | Premine the accounts with the specified ammount. Format: account:ammount,account:ammount | `string` | n/a | yes |
-| <a name="input_alb_sec_gr_name_tag"></a> [alb\_sec\_gr\_name\_tag](#input\_alb\_sec\_gr\_name\_tag) | External security group name tag | `string` | `"Polygon Edge External"` | no |
+| <a name="input_alb_ssl_certificate"></a> [alb\_ssl\_certificate](#input\_alb\_ssl\_certificate) | SSL certificate ARN for JSON-RPC load balancer | `string` | n/a | yes |
+| <a name="input_premine"></a> [premine](#input\_premine) | Premine the accounts with the specified amount. Format: account:amount,account:amount | `string` | n/a | yes |
+| <a name="input_alb_sec_gr_name_tag"></a> [alb\_sec\_gr\_name\_tag](#input\_alb\_sec\_gr\_name\_tag) | External security-group name tag | `string` | `"Polygon Edge External"` | no |
 | <a name="input_block_gas_limit"></a> [block\_gas\_limit](#input\_block\_gas\_limit) | Set the block gas limit | `string` | `""` | no |
 | <a name="input_block_gas_target"></a> [block\_gas\_target](#input\_block\_gas\_target) | Sets the target block gas limit for the chain | `string` | `""` | no |
 | <a name="input_block_time"></a> [block\_time](#input\_block\_time) | Set block production time in seconds | `string` | `""` | no |
 | <a name="input_chain_data_ebs_name_tag"></a> [chain\_data\_ebs\_name\_tag](#input\_chain\_data\_ebs\_name\_tag) | The name of the chain data EBS volume. | `string` | `"Polygon_Edge_chain_data_volume"` | no |
 | <a name="input_chain_data_ebs_volume_size"></a> [chain\_data\_ebs\_volume\_size](#input\_chain\_data\_ebs\_volume\_size) | The size of the chain data EBS volume. | `number` | `30` | no |
-| <a name="input_chain_id"></a> [chain\_id](#input\_chain\_id) | Set the Chain ID | `string` | `""` | no |
+| <a name="input_chain_id"></a> [chain\_id](#input\_chain\_id) | Set the chain ID | `string` | `""` | no |
 | <a name="input_chain_name"></a> [chain\_name](#input\_chain\_name) | Set the name of chain | `string` | `""` | no |
 | <a name="input_consensus"></a> [consensus](#input\_consensus) | Sets consensus protocol. | `string` | `""` | no |
 | <a name="input_dns_name"></a> [dns\_name](#input\_dns\_name) | Sets the DNS name for the network package | `string` | `""` | no |
@@ -136,7 +146,7 @@ process itself.
 | <a name="input_instance_interface_name_tag"></a> [instance\_interface\_name\_tag](#input\_instance\_interface\_name\_tag) | The name of the instance interface. | `string` | `"Polygon_Edge_Instance_Interface"` | no |
 | <a name="input_instance_name"></a> [instance\_name](#input\_instance\_name) | The name of Polygon Edge instance | `string` | `"Polygon_Edge_Node"` | no |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | Polygon Edge nodes instance type. | `string` | `"t3.medium"` | no |
-| <a name="input_internal_sec_gr_name_tag"></a> [internal\_sec\_gr\_name\_tag](#input\_internal\_sec\_gr\_name\_tag) | Internal security group name tag | `string` | `"Polygon Edge Internal"` | no |
+| <a name="input_internal_sec_gr_name_tag"></a> [internal\_sec\_gr\_name\_tag](#input\_internal\_sec\_gr\_name\_tag) | Internal security-group name tag | `string` | `"Polygon Edge Internal"` | no |
 | <a name="input_lambda_function_name"></a> [lambda\_function\_name](#input\_lambda\_function\_name) | The name of the Lambda function used for chain init | `string` | `"polygon-edge-init"` | no |
 | <a name="input_lambda_function_zip"></a> [lambda\_function\_zip](#input\_lambda\_function\_zip) | The lambda function code in zip archive | `string` | `"https://raw.githubusercontent.com/Trapesys/polygon-edge-assm/aws-lambda/artifacts/main.zip"` | no |
 | <a name="input_max_slots"></a> [max\_slots](#input\_max\_slots) | Sets maximum slots in the pool | `string` | `""` | no |
@@ -154,7 +164,7 @@ process itself.
 | <a name="input_s3_bucket_prefix"></a> [s3\_bucket\_prefix](#input\_s3\_bucket\_prefix) | Name prefix for new S3 bucket | `string` | `"polygon-edge-shared-"` | no |
 | <a name="input_s3_force_destroy"></a> [s3\_force\_destroy](#input\_s3\_force\_destroy) | Delete S3 bucket on destroy, even if the bucket is not empty | `bool` | `true` | no |
 | <a name="input_s3_key_name"></a> [s3\_key\_name](#input\_s3\_key\_name) | Name of the file in S3 that will hold configuration | `string` | `"chain-config"` | no |
-| <a name="input_ssm_parameter_id"></a> [ssm\_parameter\_id](#input\_ssm\_parameter\_id) | The id that will be used for storing and fetching from SSM Parameter Store | `string` | `"polygon-edge-validators"` | no |
+| <a name="input_ssm_parameter_id"></a> [ssm\_parameter\_id](#input\_ssm\_parameter\_id) | The ID that will be used for storing and fetching from SSM Parameter Store | `string` | `"polygon-edge-validators"` | no |
 | <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | CIDR block for VPC | `string` | `"10.250.0.0/16"` | no |
 | <a name="input_vpc_name"></a> [vpc\_name](#input\_vpc\_name) | Name of the VPC | `string` | `"polygon-edge-vpc"` | no |
 
@@ -162,5 +172,5 @@ process itself.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_jsonrpc_dns_name"></a> [jsonrpc\_dns\_name](#output\_jsonrpc\_dns\_name) | The dns name for the JSON-RPC API |
+| <a name="output_jsonrpc_dns_name"></a> [jsonrpc\_dns\_name](#output\_jsonrpc\_dns\_name) | The DNS name for the JSON-RPC API |
 <!-- END_TF_DOCS -->
