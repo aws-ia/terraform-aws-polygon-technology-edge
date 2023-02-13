@@ -1,7 +1,5 @@
-data "template_file" "polygon_edge_node" {
-  template = file("${path.module}/scripts/polygon_edge_node.tpl")
-
-  vars = {
+locals {
+  polygon_edge_node = templatefile("${path.module}/scripts/polygon_edge_node.tfpl", {
     "polygon_edge_dir"     = var.polygon_edge_dir
     "ebs_device"           = var.ebs_device
     "node_name"            = var.node_name
@@ -21,12 +19,8 @@ data "template_file" "polygon_edge_node" {
     "max_validator_count" = var.max_validator_count
     "min_validator_count" = var.min_validator_count
     "consensus"           = var.consensus
-  }
-}
-
-data "template_file" "polygon_edge_server" {
-  template = file("${path.module}/scripts/polygon_edge_server.tpl")
-  vars = {
+  })
+  polygon_edge_server = templatefile("${path.module}/scripts/polygon_edge_server.tfpl", {
     "polygon_edge_dir"   = var.polygon_edge_dir
     "s3_bucket_name"     = var.s3_bucket_name
     "prometheus_address" = var.prometheus_address
@@ -36,20 +30,22 @@ data "template_file" "polygon_edge_server" {
     "price_limit"        = var.price_limit
     "max_slots"          = var.max_slots
     "block_time"         = var.block_time
-  }
+  })
 }
 
-data "template_cloudinit_config" "polygon_edge" {
+data "cloudinit_config" "polygon_edge" {
   gzip          = true
   base64_encode = true
 
   part {
     content_type = "text/x-shellscript"
-    content      = data.template_file.polygon_edge_node.rendered
+    content      = local.polygon_edge_node
+    filename     = "01-polygon-edge-node.sh"
   }
 
   part {
     content_type = "text/x-shellscript"
-    content      = data.template_file.polygon_edge_server.rendered
+    content      = local.polygon_edge_server
+    filename     = "02-polygon-edge-server.sh"
   }
 }
