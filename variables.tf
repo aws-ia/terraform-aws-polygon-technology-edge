@@ -29,18 +29,18 @@ variable "s3_key_name" {
 
 # SECURITY
 variable "ssm_parameter_id" {
-  description = "The id that will be used for storing and fetching from SSM Parameter Store"
+  description = "The ID that will be used for storing and fetching from SSM Parameter Store"
   type        = string
   default     = "polygon-edge-validators"
 }
 variable "internal_sec_gr_name_tag" {
   type        = string
-  description = "Internal security group name tag"
+  description = "Internal security-group name tag"
   default     = "Polygon Edge Internal"
 }
 variable "alb_sec_gr_name_tag" {
   type        = string
-  description = "External security group name tag"
+  description = "External security-group name tag"
   default     = "Polygon Edge External"
 }
 
@@ -104,7 +104,7 @@ variable "chain_name" {
 
 variable "chain_id" {
   type        = string
-  description = "Set the Chain ID"
+  description = "Set the chain ID"
   default     = ""
 }
 
@@ -116,7 +116,7 @@ variable "block_gas_limit" {
 
 variable "premine" {
   type        = string
-  description = "Premine the accounts with the specified ammount. Format: account:ammount,account:ammount"
+  description = "Premine the accounts with the specified amount. Format: account:amount,account:amount"
 }
 
 variable "epoch_size" {
@@ -184,7 +184,7 @@ variable "block_time" {
 #ALB
 variable "alb_ssl_certificate" {
   type        = string
-  description = "SSL certificate ARN for JSON-RPC loadblancer"
+  description = "SSL certificate ARN for JSON-RPC load balancer"
 }
 variable "nodes_alb_name_prefix" {
   type        = string

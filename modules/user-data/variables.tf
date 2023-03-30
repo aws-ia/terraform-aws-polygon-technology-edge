@@ -34,7 +34,7 @@ variable "chain_name" {
 }
 variable "chain_id" {
   type        = string
-  description = "Set the Chain ID"
+  description = "Set the chain ID"
 }
 variable "block_gas_limit" {
   type        = string
@@ -42,7 +42,7 @@ variable "block_gas_limit" {
 }
 variable "premine" {
   type        = string
-  description = "Premine the accounts with the specified ammount."
+  description = "Premine the accounts with the specified amount."
 }
 variable "epoch_size" {
   type        = string

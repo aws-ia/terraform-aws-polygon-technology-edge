@@ -20,7 +20,7 @@ variable "nodes_alb_targetgroup_name_prefix" {
 }
 variable "vpc_id" {
   type        = string
-  description = "VPC id"
+  description = "ID of the VPC"
 }
 variable "node_ids" {
   type        = list(string)
